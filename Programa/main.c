@@ -1,45 +1,69 @@
 #include <stdio.h>
 #include <windows.h>
 #include "menu.h"
+#include "validacion.h"
 
 int main() {
     SetConsoleOutputCP(CP_UTF8);
+    char user[50];
+    char password[50];
+    int tries = 5;
+    int access = 0;
     
     for(;;) {
         int option1 = menuGeneral();
         switch (option1)
         {
         case 1:
-            for(;;) {
-                int option2 = menuAdmin();
-                switch (option2)
-                {
-                case 1:
-                    printf("Dentro de gestor de sitios de eventos\n");
-                    break;
-                case 2:
-                    printf("Dentro de gestor de espacios en sitio de evento\n");
-                    break;
-                case 3:
-                    printf("Dentro de gestor de eventos\n");
-                    break;
-                case 4:
-                    printf("Dentro de estado de evento\n");
-                    break;
-                case 5:
-                    printf("Dentro de lista de facturas\n");
-                    break;
-                case 6:
-                    printf("Dentro de estadísticas\n");
-                    break;
-                case 7:
-                    printf("Volviendo al menú principal...\n");
-                    break;
-                default:
-                    printf("Opción inválida\n");
-                    break;
+
+            while (tries > 0 && !access) {
+                printf("Ingrese su usuario: ");
+                scanf("%49s", user);
+
+                printf("Ingrese su contraseña: ");
+                scanf("%49s", password);
+
+                access = validate(user, password);
+
+                if (!access) {
+                    printf("Credenciales incorrectas, intente de nuevo\n");
+                    tries--;
                 }
-                if (option2 == 7) break;
+            }
+            if(access) {
+                for(;;) {
+                    int option2 = menuAdmin();
+                    switch (option2)
+                    {
+                    case 1:
+                        printf("Dentro de gestor de sitios de eventos\n");
+                        break;
+                    case 2:
+                        printf("Dentro de gestor de espacios en sitio de evento\n");
+                        break;
+                    case 3:
+                        printf("Dentro de gestor de eventos\n");
+                        break;
+                    case 4:
+                        printf("Dentro de estado de evento\n");
+                        break;
+                    case 5:
+                        printf("Dentro de lista de facturas\n");
+                        break;
+                    case 6:
+                        printf("Dentro de estadísticas\n");
+                        break;
+                    case 7:
+                        printf("Volviendo al menú principal...\n");
+                        break;
+                    default:
+                        printf("Opción inválida\n");
+                        break;
+                    }
+                    if (option2 == 7) break;
+                }
+            } else {
+                printf("Demasiados tries\n");
             }
             break;
         case 2:
