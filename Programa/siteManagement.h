@@ -1,0 +1,21 @@
+#ifndef SITEMANAGEMENT_H
+#define SITEMANAGEMENT_H
+
+struct Site {
+    char nombre[50];
+    char ubicacion[50];
+    char web[50];
+};
+
+extern struct Site *sitios;
+extern int numSitios;
+
+int menuSitesManagement();
+void manageSitesMenu();
+void loadFile();
+void editSite();
+void deleteSite();
+void loadInitialSites();
+void saveFile();
+
+#endif

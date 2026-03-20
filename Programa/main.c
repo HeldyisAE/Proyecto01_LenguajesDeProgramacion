@@ -2,9 +2,14 @@
 #include <windows.h>
 #include "menu.h"
 #include "validacion.h"
+#include "siteManagement.h"
 
 int main() {
     SetConsoleOutputCP(CP_UTF8);
+    
+    // Cargar sitios existentes al iniciar el programa
+    loadInitialSites();
+    
     char user[50];
     char password[50];
     int tries = 5;
@@ -36,7 +41,7 @@ int main() {
                     switch (option2)
                     {
                     case 1:
-                        printf("Dentro de gestor de sitios de eventos\n");
+                        manageSitesMenu();
                         break;
                     case 2:
                         printf("Dentro de gestor de espacios en sitio de evento\n");
