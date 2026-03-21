@@ -15,6 +15,7 @@ void manageSitesMenu();
 void loadFile();
 void editSite();
 void deleteSite();
+void showSites();
 void loadInitialSites();
 void saveFile();
 

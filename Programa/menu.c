@@ -15,7 +15,7 @@ int menuAdmin() {
     printf("4. Estado de evento\n");
     printf("5. Lista de facturas\n");
     printf("6. Estadisticas\n");
-    printf("7. Volver\n");
+    printf("0. Volver\n");
     printf("------------------------------\n");
     printf("> ");
     scanf("%d", &option);
@@ -36,7 +36,7 @@ int menuGeneral() {
     printf("1. Opciones administrativas\n");
     printf("2. Consulta por evento\n");
     printf("3. Compra de boletos\n");
-    printf("4. Salir\n");
+    printf("0. Salir\n");
     printf("------------------------------\n");
     printf("> ");
     scanf("%d", &option);

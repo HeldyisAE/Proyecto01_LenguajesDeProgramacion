@@ -58,14 +58,14 @@ int main() {
                     case 6:
                         printf("Dentro de estadísticas\n");
                         break;
-                    case 7:
+                    case 0:
                         printf("Volviendo al menú principal...\n");
                         break;
                     default:
                         printf("Opción inválida\n");
                         break;
                     }
-                    if (option2 == 7) break;
+                    if (option2 == 0) break;
                 }
             } else {
                 printf("Demasiados tries\n");
@@ -77,14 +77,14 @@ int main() {
         case 3:
             printf("Dentro de compra de boletos\n");
             break;
-        case 4:
+        case 0:
             printf("Hasta la próxima\n");
             break;
         default:
             printf("Opción inválida\n");
             break;
         }
-        if (option1 == 4) break;
+        if (option1 == 0) break;
     }
     return 0;
 }
