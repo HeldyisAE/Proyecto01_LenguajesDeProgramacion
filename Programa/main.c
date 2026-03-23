@@ -3,11 +3,11 @@
 #include "menu.h"
 #include "validacion.h"
 #include "siteManagement.h"
+#include "eventManagement.h"
 
 int main() {
     SetConsoleOutputCP(CP_UTF8);
     
-    // Cargar sitios existentes al iniciar el programa
     loadInitialSites();
     
     char user[50];
@@ -20,7 +20,6 @@ int main() {
         switch (option1)
         {
         case 1:
-
             while (tries > 0 && !access) {
                 printf("Ingrese su usuario: ");
                 scanf("%49s", user);
@@ -44,10 +43,10 @@ int main() {
                         manageSitesMenu();
                         break;
                     case 2:
-                        printf("Dentro de gestor de espacios en sitio de evento\n");
+                        gestionarSectores(); 
                         break;
                     case 3:
-                        printf("Dentro de gestor de eventos\n");
+                        gestionarEventos();
                         break;
                     case 4:
                         printf("Dentro de estado de evento\n");

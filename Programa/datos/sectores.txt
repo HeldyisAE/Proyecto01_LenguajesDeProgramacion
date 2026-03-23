@@ -1,0 +1,2 @@
+Casa de la Cultura|VIP|S|15|15000.00
+Casa de la Cultura|General|A|50|5000.00

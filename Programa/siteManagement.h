@@ -5,6 +5,8 @@ struct Site {
     char nombre[50];
     char ubicacion[50];
     char web[50];
+    struct Sector *sectores; // Puntero para la memoria dinámica
+    int numSectores;         // Contador de cuántos sectores tiene el sitio
 };
 
 extern struct Site *sitios;
