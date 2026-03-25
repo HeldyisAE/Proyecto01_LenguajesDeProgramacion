@@ -13,6 +13,7 @@ extern struct Site *sitios;
 extern int numSitios;
 
 int menuSitesManagement();
+int findSiteIndexByName(const char *nombre);
 void manageSitesMenu();
 void loadFile();
 void editSite();

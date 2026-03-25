@@ -10,7 +10,6 @@ static const int INCREMENTO_MEMORIA = 5;
 
 static void limpiarBuffer();
 static int siteExists(const char *nombre);
-static int findSiteIndexByName(const char *nombre);
 static void trimWhitespace(char *str);
 static void cargarSitiosDesdeArchivo(const char *rutaArchivo, int esInicial);
 
@@ -37,7 +36,7 @@ static int siteExists(const char *nombre) {
     return 0;
 }
 
-static int findSiteIndexByName(const char *nombre) {
+int findSiteIndexByName(const char *nombre) {
     for (int i = 0; i < numSitios; i++) {
         if (strcmp(sitios[i].nombre, nombre) == 0) {
             return i;
@@ -145,6 +144,8 @@ static void cargarSitiosDesdeArchivo(const char *rutaArchivo, int esInicial) {
         strcpy(sitios[numSitios].nombre, nombre);
         strcpy(sitios[numSitios].ubicacion, ubicacion);
         strcpy(sitios[numSitios].web, web);
+        sitios[numSitios].sectores = NULL;
+        sitios[numSitios].numSectores = 0;
         numSitios++;
         sitiosAgregados++;
     }

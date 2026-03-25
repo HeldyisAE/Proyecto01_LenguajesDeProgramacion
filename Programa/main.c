@@ -4,11 +4,14 @@
 #include "validacion.h"
 #include "siteManagement.h"
 #include "eventManagement.h"
+#include "eventStatus.h"
 
 int main() {
     SetConsoleOutputCP(CP_UTF8);
     
     loadInitialSites();
+    loadEvents();
+    loadSegments();
     
     char user[50];
     char password[50];
@@ -49,7 +52,7 @@ int main() {
                         gestionarEventos();
                         break;
                     case 4:
-                        printf("Dentro de estado de evento\n");
+                        printEventStatus();
                         break;
                     case 5:
                         printf("Dentro de lista de facturas\n");

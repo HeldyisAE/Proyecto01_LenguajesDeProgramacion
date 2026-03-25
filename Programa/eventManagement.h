@@ -16,6 +16,7 @@ struct Evento {
     char hora[10];
     int idSitio;            
     float *preciosSectores;
+    char productora[100];
 };
 
 extern struct Evento *eventos;
@@ -25,5 +26,7 @@ void gestionarSectores();
 void gestionarEventos();
 void guardarSectores();
 void guardarEventos();
+void loadEvents();
+void loadSegments();
 
 #endif
