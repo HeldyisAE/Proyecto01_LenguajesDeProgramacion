@@ -5,6 +5,7 @@
 #include "siteManagement.h"
 #include "eventManagement.h"
 #include "eventStatus.h"
+#include "queryEvent.h"
 
 int main() {
     SetConsoleOutputCP(CP_UTF8);
@@ -74,7 +75,7 @@ int main() {
             }
             break;
         case 2:
-            printf("Dentro de consulta por eventos\n");
+            showEvents();
             break;
         case 3:
             printf("Dentro de compra de boletos\n");

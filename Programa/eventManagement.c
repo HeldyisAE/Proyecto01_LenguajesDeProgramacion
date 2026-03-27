@@ -165,7 +165,7 @@ static void cargarEventosDesdeArchivo(const char *rutaArchivo) {
     }
 
     char linea[256];
-    char nombre[100], fecha[15], hora[10];
+    char nombre[100], productora[100], fecha[15], hora[10];
     int idSitio;
 
     while (fgets(linea, sizeof(linea), f)) {
@@ -175,10 +175,10 @@ static void cargarEventosDesdeArchivo(const char *rutaArchivo) {
 
         if (strlen(linea) == 0) continue;
 
-        int r = sscanf(linea, "%99[^|]|%14[^|]|%9[^|]|%d",
-                       nombre, fecha, hora, &idSitio);
+        int r = sscanf(linea, "%99[^|]|%99[^|]|%14[^|]|%9[^|]|%d",
+                        nombre, productora, fecha, hora, &idSitio);
 
-        if (r != 4) {
+        if (r != 5) {
             printf("Linea inválida (evento): %s\n", linea);
             continue;
         }
@@ -193,6 +193,7 @@ static void cargarEventosDesdeArchivo(const char *rutaArchivo) {
         eventos = temp;
 
         strcpy(eventos[numEventos].nombre, nombre);
+        strcpy(eventos[numEventos].productora, productora);
         strcpy(eventos[numEventos].fecha, fecha);
         strcpy(eventos[numEventos].hora, hora);
         eventos[numEventos].idSitio = idSitio;
@@ -300,9 +301,12 @@ void guardarEventos() {
     FILE *f = fopen("datos/eventos.txt", "w");
     if (!f) return;
     for (int i = 0; i < numEventos; i++) {
-        fprintf(f, "%s|%s|%s|%d\n", 
-                eventos[i].nombre, eventos[i].fecha, 
-                eventos[i].hora, eventos[i].idSitio);
+        fprintf(f, "%s|%s|%s|%s|%d\n", 
+            eventos[i].nombre, 
+            eventos[i].productora,
+            eventos[i].fecha, 
+            eventos[i].hora, 
+            eventos[i].idSitio);
     }
     fclose(f);
 }

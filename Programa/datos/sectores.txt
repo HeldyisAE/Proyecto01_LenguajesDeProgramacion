@@ -1,4 +1,3 @@
-Casa de la Cultura|VIP|S|15|15000.00
-Casa de la Cultura|General|A|50|5000.00
-Anfiteatro|Grader¡a|G|50|2500.00
-Anfiteatro|platea|P|20|4000.00
+Casa de la Cultura|VIP|V|20|5000.00
+Casa de la Cultura|Platea|P|60|2500.00
+Casa de la Cultura|Palco|A|60|1000.00
