@@ -6,6 +6,7 @@
 #include "eventManagement.h"
 #include "eventStatus.h"
 #include "queryEvent.h"
+#include "billing.h"
 
 int main() {
     SetConsoleOutputCP(CP_UTF8);
@@ -56,10 +57,10 @@ int main() {
                         printEventStatus();
                         break;
                     case 5:
-                        printf("Dentro de lista de facturas\n");
+                        mostrarListaFacturas();
                         break;
                     case 6:
-                        printf("Dentro de estadísticas\n");
+                        mostrarEstadisticas();
                         break;
                     case 0:
                         printf("Volviendo al menú principal...\n");
