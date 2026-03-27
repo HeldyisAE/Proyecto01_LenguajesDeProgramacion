@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <windows.h>
+#include <time.h>
 #include "menu.h"
 #include "validacion.h"
 #include "siteManagement.h"
@@ -7,6 +8,8 @@
 #include "eventStatus.h"
 #include "queryEvent.h"
 #include "billing.h"
+#include "billing.h"
+#include "ventaBoletos.h"
 
 int main() {
     SetConsoleOutputCP(CP_UTF8);
@@ -79,7 +82,8 @@ int main() {
             showEvents();
             break;
         case 3:
-            printf("Dentro de compra de boletos\n");
+            srand(time(NULL));
+            procesoCompra();
             break;
         case 0:
             printf("Hasta la próxima\n");
