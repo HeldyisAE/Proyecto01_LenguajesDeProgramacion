@@ -27,14 +27,14 @@ void sectorInfo(int index) {
 
         float precio;
 
-        // 🔹 Precio (evento o base)
+        // Precio (evento o base)
         if (eventos[index].preciosSectores != NULL) {
             precio = eventos[index].preciosSectores[i];
         } else {
             precio = s.precioBase;
         }
 
-        // 🔹 Crear arreglo de ocupación
+        // Crear arreglo de ocupación
         int *ocupados = (int *)calloc(s.capacidad, sizeof(int));
         if (!ocupados) {
             printf("Error de memoria\n");
@@ -43,7 +43,7 @@ void sectorInfo(int index) {
 
         float total = 0;
 
-        // 🔹 Leer archivo de ventas
+        // Leer archivo de ventas
         FILE *f = fopen("datos/facturas.txt", "r");
         if (f) {
             char linea[256];
@@ -71,7 +71,7 @@ void sectorInfo(int index) {
             fclose(f);
         }
 
-        // 🔹 Mostrar info del sector
+        // Mostrar info del sector
         printf("\nSector: %s\n", s.nombre);
         printf("Precio por asiento: %.2f\n", precio);
         printf("Monto recaudado: %.2f\n", total);
