@@ -2,14 +2,40 @@
 #include <string.h>
 #include "validacion.h"
 
+//Prototipos de funciones estáticas
 static void cifrarCesar(char *texto, int shift);
 
+/*
+ * cifrarCesar
+ *
+ * Objetivo: Cifra un texto aplicando el algoritmo César con el desplazamiento indicado
+ *
+ * Entradas: char *texto - Cadena de texto a cifrar
+ *           int shift - Valor de desplazamiento a aplicar en el cifrado
+ *
+ * Salidas: void
+ *
+ * Restricciones: texto no debe ser NULL
+ */
 static void cifrarCesar(char *texto, int shift) {
     for (int i = 0; texto[i] != '\0'; i++) {
-        texto[i] = texto[i] + shift;
+        texto[i] = texto[i] + shift; //Desplaza el valor ASCII del carácter
     }
 }
 
+/*
+ * leerCredenciales
+ *
+ * Objetivo: Abrir el archivo de credenciales y extraer el usuario y contraseña almacenados
+ *
+ * Entradas: char user[] - Arreglo donde se almacenará el usuario leído
+ *           char password[] - Arreglo donde se almacenará la contraseña leída
+ *
+ * Salidas: void
+ *
+ * Restricciones: Se espera que el archivo exista en la ruta definida por RUTA_CREDENCIALES
+ * y que tenga el formato JSON esperado
+ */
 void leerCredenciales(char user[], char password[]) {
     FILE *file = fopen(RUTA_CREDENCIALES, "r");
 
@@ -37,11 +63,24 @@ void leerCredenciales(char user[], char password[]) {
     }
 }
 
+/*
+ * validate
+ *
+ * Objetivo: Validar las credenciales ingresadas por el usuario
+ *
+ * Entradas: char user[] - Usuario ingresado por el usuario
+ *           char password[] - Contraseña ingresada por el usuario
+ *
+ * Salidas: int - Retorna 1 si las credenciales son correctas, 0 de lo contrario
+ *
+ * Restricciones: Se espera que el archivo de credenciales esté disponible y que
+ * la contraseña almacenada esté cifrada con César
+ */
 int validate(char user[], char password[]) {
     char userFile[MAX_USUARIO];
     char passwordFile[MAX_PASSWORD];
 
-    leerCredenciales(userFile, passwordFile);
+    leerCredenciales(userFile, passwordFile); //Carga credenciales desde archivo
 
     // Copia de la contraseña ingresada
     char passwordCifrada[50];

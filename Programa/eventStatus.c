@@ -5,6 +5,18 @@
 #include "eventManagement.h"
 #include "siteManagement.h"
 
+/*
+ * eventInfo
+ *
+ * Objetivo: Imprimir la información general de un evento específico
+ *
+ * Entradas: int index - Índice del evento dentro del arreglo eventos
+ *
+ * Salidas: void
+ *
+ * Restricciones: index debe ser un valor válido dentro del rango del arreglo de eventos.
+ * Los arreglos de eventos y sitios debe estar inicializado
+ */
 void eventInfo(int index) {
     int sitioIndice = eventos[index].idSitio;
 
@@ -16,6 +28,19 @@ void eventInfo(int index) {
     printf("Sitio: %s\n", sitios[sitioIndice].nombre);
 }
 
+/*
+ * sectorInfo
+ *
+ * Objetivo: Mostrar el estado de ocupación y recaudación de cada sector
+ * para un evento específico
+ *
+ * Entradas: int index - Índice del evento dentro del arreglo global de eventos
+ *
+ * Salidas: void
+ *
+ * Restricciones: index debe ser un valor válido dentro del rango del arreglo de eventos.
+ * Se espera que el archivo de facturas exista.
+ */
 void sectorInfo(int index) {
     int sitioIndice = eventos[index].idSitio;
     int numSect = sitios[sitioIndice].numSectores;
@@ -27,7 +52,7 @@ void sectorInfo(int index) {
 
         float precio;
 
-        // Precio (evento o base)
+        // Obtiene los precios del arreglo
         if (eventos[index].preciosSectores != NULL) {
             precio = eventos[index].preciosSectores[i];
         } else {
@@ -57,7 +82,7 @@ void sectorInfo(int index) {
                 if (sscanf(linea, "%d|%49[^|]|%99[^|]|%49[^|]|%d|%f",
                            &id, cliente, nombreEv, nombreSec, &asiento, &precioVenta) == 6) {
 
-                    // 🔹 Verifica si coincide evento y sector
+                    // Verifica si coincide evento y sector
                     if (strcmp(nombreEv, eventos[index].nombre) == 0 &&
                         strcmp(nombreSec, s.nombre) == 0) {
 
@@ -90,6 +115,18 @@ void sectorInfo(int index) {
     }
 }
 
+/*
+ * printEventStatus
+ *
+ * Objetivo: Mostrar el menú de selección de eventos
+ *
+ * Entradas: option - Valor ingresado por el usuario para seleccionar el evento
+ *
+ * Salidas: void
+ *
+ * Restricciones: Debe haber al menos un evento registrado en el sistema.
+ * Se espera que el usuario ingrese un valor numérico dentro del rango válido
+ */
 void printEventStatus() {
     if (numEventos == 0) {
         printf("\n ! No hay eventos registrados.\n");

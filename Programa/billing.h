@@ -1,6 +1,7 @@
 #ifndef BILLING_H
 #define BILLING_H
 
+//Definición de estructuras
 struct Factura {
     int idFactura;
     char cliente[50];
@@ -27,6 +28,7 @@ struct SitioStats {
     float recaudacion;
 };
 
+//Define prototipos
 void mostrarListaFacturas();
 void mostrarEstadisticas();
 

@@ -1,6 +1,18 @@
 #include <stdio.h>
 #include "menu.h"
 
+/*
+ * MenuAdmin
+ *
+ * Objetivo: Imprimir el menú de opciones de administrador
+ *
+ * Entradas: option - Representa la elección del usuario dentro del menu
+ *
+ * Salidas: option - Retorna la opción para ser utilizada en main
+ *
+ * Restricciones: Se espera que el usuario ingrese un int dentro del
+ * rango correspondiente
+ */
 int menuAdmin() {
     int option;
 
@@ -23,6 +35,18 @@ int menuAdmin() {
     return option;
 }
 
+/*
+ * menuGeneral
+ *
+ * Objetivo: Imprimir el menú de opciones generales
+ *
+ * Entradas: option - Representa la elección del usuario dentro del menu
+ *
+ * Salidas: option - Retorna la opción para ser utilizada en main
+ *
+ * Restricciones: Se espera que el usuario ingrese un int dentro del
+ * rango correspondiente
+ */
 int menuGeneral() {
     int option;
 

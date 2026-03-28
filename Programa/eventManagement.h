@@ -3,10 +3,12 @@
 
 #include "siteManagement.h"
 
+//Define macros de direcciones
 #define RUTA_EVENTOS    "datos/eventos.txt"
 #define RUTA_SECTORES   "datos/sectores.txt"
 #define RUTA_PRECIOS    "datos/precios.txt"
 
+//Define macros de constantes
 #define MAX_NOMBRE_EVENTO       100
 #define MAX_PRODUCTORA          100
 #define MAX_NOMBRE_SECTOR       30
@@ -14,6 +16,7 @@
 #define MAX_FECHA_EVENTO        15
 #define MAX_HORA_EVENTO         10
 
+//Define estructuras
 struct Sector {
     char nombre[30];
     char codigoInicial;
@@ -31,9 +34,11 @@ struct Evento {
     char productora[100];
 };
 
+//Define variables globales
 extern struct Evento *eventos;
 extern int numEventos;
 
+//Define prototipos
 void gestionarSectores();
 void gestionarEventos();
 void guardarSectores();

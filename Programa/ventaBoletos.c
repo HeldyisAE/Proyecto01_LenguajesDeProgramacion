@@ -6,9 +6,21 @@
 #include "eventManagement.h"
 #include "siteManagement.h"
 
+//Prototipos de funciones estáticas
 static void obtenerFechaActual(char *buffer);
 static int asientoYaVendido(char *nombreEvento, char *nombreSector, int asiento);
 
+/*
+ * obtenerFechaActual
+ *
+ * Objetivo: Obtener la fecha actual del sistema
+ *
+ * Entradas: char *buffer - Arreglo donde se almacenará la fecha formateada
+ *
+ * Salidas: void
+ *
+ * Restricciones: El buffer debe tener espacio suficiente
+ */
 static void obtenerFechaActual(char *buffer) {
     time_t t = time(NULL);
     struct tm *tm = localtime(&t);
@@ -16,6 +28,19 @@ static void obtenerFechaActual(char *buffer) {
     strftime(buffer, 15, "%d/%m/%Y", tm);
 }
 
+/*
+ * asientoYaVendido
+ *
+ * Objetivo: Verificar si un asiento ya fue vendido para un evento y sector específico
+ *
+ * Entradas: char *nombreEvento - Nombre del evento a consultar
+ *           char *nombreSector - Nombre del sector a consultar
+ *           int asiento - Número del asiento a verificar
+ *
+ * Salidas: int - Retorna 1 si el asiento está ocupado, 0 si está libre
+ *
+ * Restricciones: Se espera que el archivo de facturas exista
+ */
 static int asientoYaVendido(char *nombreEvento, char *nombreSector, int asiento) {
     FILE *f = fopen("datos/facturas.txt", "r");
     if (!f) return 0; //0 es libre, 1 es ocupado
@@ -31,6 +56,7 @@ static int asientoYaVendido(char *nombreEvento, char *nombreSector, int asiento)
         if (sscanf(linea, "%d|%49[^|]|%99[^|]|%49[^|]|%d|%f|%14[^|]",
                    &id, cliente, evento, sector, &asientoFile, &precio, fecha) == 7) {
 
+            //Comparaciones
             if (strcmp(evento, nombreEvento) == 0 &&
                 strcmp(sector, nombreSector) == 0 &&
                 asientoFile == asiento) {
@@ -45,6 +71,20 @@ static int asientoYaVendido(char *nombreEvento, char *nombreSector, int asiento)
     return 0; 
 }
 
+/*
+ * procesoCompra
+ *
+ * Objetivo: Gestionar el proceso completo de compra de boletos
+ *
+ * Entradas: Los valores son ingresados manualmente por el usuario
+ * durante la ejecución
+ *
+ * Salidas: void
+ *
+ * Restricciones: Debe haber al menos un evento registrado en el sistema.
+ * Los índices de evento y sector deben estar dentro del rango válido.
+ * La cantidad de boletos no debe superar MAX_ASIENTOS
+ */
 void procesoCompra() {
     if (numEventos == 0) {
         printf("\n! No hay eventos disponibles.\n");
@@ -59,7 +99,7 @@ void procesoCompra() {
     int selEv;
     printf("Seleccione un evento: ");
     scanf("%d", &selEv);
-    int evIndex = selEv - 1;
+    int evIndex = selEv - 1; //Resta 1 a la selección para obtener el indice real
     int sitIndex = eventos[evIndex].idSitio;
 
     printf("\nSECTORES en %s:\n", sitios[sitIndex].nombre);
@@ -91,7 +131,7 @@ void procesoCompra() {
     scanf("%d", &cantidad);
 
     int asientos[MAX_ASIENTOS];
-    float precio = eventos[evIndex].preciosSectores[secIndex];
+    float precio = eventos[evIndex].preciosSectores[secIndex]; //Obtiene precio del arreglo preciosSectores
 
     float subtotal = 0;
 
@@ -115,14 +155,16 @@ void procesoCompra() {
         subtotal += precio;
     }
 
+    //Cálculo de cobro
     float servicio = subtotal * 0.05;
     float total = subtotal + servicio;
 
     char fechaCompra[MAX_FECHA];
     obtenerFechaActual(fechaCompra);
 
-    int id = rand() % 9000 + 1000;
+    int id = rand() % 9000 + 1000; //Genera aleatorio de la factura
 
+    //Append de la nueva compra
     FILE *f = fopen("datos/facturas.txt", "a");
     if (f) {
         for (int i = 0; i < cantidad; i++) {
@@ -138,10 +180,7 @@ void procesoCompra() {
         fclose(f);
     }
 
-    // ============================
-    // Imprimir factura
-    // ============================
-
+    //Imprime detalles de factura
     printf("\n=========== FACTURA ===========\n");
     printf("ID Factura: %d\n", id);
     printf("Fecha compra: %s\n", fechaCompra);

@@ -1,6 +1,7 @@
 #ifndef SITEMANAGEMENT_H
 #define SITEMANAGEMENT_H
 
+//Definición de macros
 #define MAX_NOMBRE       50
 #define MAX_UBICACION    50
 #define MAX_WEB          50
@@ -9,6 +10,7 @@
 #define INCREMENTO_MEMORIA  5
 #define RUTA_SITIOS  "datos/sitios.txt"
 
+//Definición de struct
 struct Site {
     char nombre[50];
     char ubicacion[50];
@@ -17,9 +19,11 @@ struct Site {
     int numSectores;         // Contador de cuántos sectores tiene el sitio
 };
 
+//Definiciones externas
 extern struct Site *sitios;
 extern int numSitios;
 
+//Prototipos
 int menuSitesManagement();
 int findSiteIndexByName(const char *nombre);
 void manageSitesMenu();

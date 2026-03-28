@@ -3,15 +3,29 @@
 #include <string.h>
 #include "siteManagement.h"
 
+//Definición de variables globales
 struct Site *sitios = NULL;
 int numSitios = 0;
-static int capacidad = 0;
+static int capacidad = 0; //Cantidad de sitios en sistema
 
+//Prototipos de funciones estáticas
 static void limpiarBuffer();
 static int siteExists(const char *nombre);
 static void trimWhitespace(char *str);
 static void cargarSitiosDesdeArchivo(const char *rutaArchivo, int esInicial);
 
+/*
+ * menuSitesManagement
+ *
+ * Objetivo: Imprimir el menú de opciones para gestionar sitios de evento
+ *
+ * Entradas: option - Representa la elección del usuario dentro del menu
+ *
+ * Salidas: option - Retorna la opción para ser utilizada en main
+ *
+ * Restricciones: Se espera que el usuario ingrese un int dentro del
+ * rango correspondiente
+ */
 int menuSitesManagement() {
     int option;
     printf("\n-------Gestión de Sitios de Eventos-------\n");
@@ -26,15 +40,37 @@ int menuSitesManagement() {
     return option;
 }
 
+/*
+ * siteExists
+ *
+ * Objetivo: Verificar que el sitio exista en el sistema
+ *
+ * Entradas: const char *nombre - Es el nombre del sitio que está buscando
+ *
+ * Salidas: int - Retorna 1 si el sitio existe, de lo contario es 0
+ *
+ * Restricciones: Sitios debe estar inicializado
+ */
 static int siteExists(const char *nombre) {
     for (int i = 0; i < numSitios; i++) {
-        if (strcmp(sitios[i].nombre, nombre) == 0) {
+        if (strcmp(sitios[i].nombre, nombre) == 0) { //Compara los nombres de los sitios existentes con el buscado
             return 1;
         }
     }
     return 0;
 }
 
+/*
+ * findSiteIndexByName
+ *
+ * Objetivo: Encontrar el indice dentro del arreglo del sitio buscado
+ *
+ * Entradas: const char *nombre - Es el nombre del sitio que está buscando
+ *
+ * Salidas: int - retorna el índice del sitio dentro del arreglo, o -1 si no se encuentra
+ *
+ * Restricciones: Sitios debe estar inicializado
+ */
 int findSiteIndexByName(const char *nombre) {
     for (int i = 0; i < numSitios; i++) {
         if (strcmp(sitios[i].nombre, nombre) == 0) {
@@ -44,6 +80,17 @@ int findSiteIndexByName(const char *nombre) {
     return -1;
 }
 
+/*
+ * trimWhitespace
+ *
+ * Objetivo: Eliminar espacios en blanco dentro de una linea
+ *
+ * Entradas: char *str - Representa la linea que se está procesando
+ *
+ * Salidas: void
+ *
+ * Restricciones: Sin restricciones específicas
+ */
 static void trimWhitespace(char *str) {
     int start = 0, end = strlen(str) - 1;
     
@@ -60,22 +107,46 @@ static void trimWhitespace(char *str) {
     // Copia cadena limpia
     int j = 0;
     for (int i = start; i <= end; i++) {
-        str[j++] = str[i];
+        str[j++] = str[i]; //Coloca la nueva linea
     }
     str[j] = '\0';
 }
 
-// Función auxiliar para limpiar el buffer de entrada
+/*
+ * limpiarBuffer
+ *
+ * Objetivo: Libera buffer después de un scanf
+ *
+ * Entradas: Sin entradas
+ *
+ * Salidas: void
+ *
+ * Restricciones: Sin restricciones específicas
+ */
 static void limpiarBuffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
+/*
+ * cargarSitiosDesdeArchivo
+ *
+ * Objetivo: Entrar al archivo de sitios en modo lectura y cargarlos al arreglo 
+ *
+ * Entradas: const char *rutaArchivo - Representa la ruta del archivo para lectura 
+ *           int esInicial - Corresponde a un int booleano (0, 1) para describir el estado
+ * de ejecución actual, diferencia si se está cargando un nuevo archivo o si se está iniciando
+ * el sistema
+ *
+ * Salidas: void
+ *
+ * Restricciones: Se espera que la ruta de archivo sea válida, 
+ */
 static void cargarSitiosDesdeArchivo(const char *rutaArchivo, int esInicial) {
     FILE *archivo;
     char linea[MAX_LINEA];
     char nombre[MAX_NOMBRE], ubicacion[MAX_UBICACION], web[MAX_WEB];
-    int resultado;
+    int resultado; //Linea parseada
     int sitiosAgregados = 0;
     int sitiosDuplicados = 0;
     
@@ -91,6 +162,7 @@ static void cargarSitiosDesdeArchivo(const char *rutaArchivo, int esInicial) {
     
     while (fgets(linea, sizeof(linea), archivo) != NULL) {
 
+        //Limpia saltos de linea
         if (linea[strlen(linea) - 1] == '\n') {
             linea[strlen(linea) - 1] = '\0';
         }
@@ -109,7 +181,7 @@ static void cargarSitiosDesdeArchivo(const char *rutaArchivo, int esInicial) {
             continue;
         }
         
-
+        //Limpia espacios en blanco en los valores
         trimWhitespace(nombre);
         trimWhitespace(ubicacion);
         if (resultado == 3) {
@@ -130,7 +202,7 @@ static void cargarSitiosDesdeArchivo(const char *rutaArchivo, int esInicial) {
         // Expande memoria si es necesario
         if (numSitios >= capacidad) {
             capacidad += INCREMENTO_MEMORIA;
-            struct Site *temp = realloc(sitios, capacidad * sizeof(struct Site));
+            struct Site *temp = realloc(sitios, capacidad * sizeof(struct Site)); //Crea puntero temporal
             if (temp == NULL) {
                 printf("Error: No se pudo asignar memoria\n");
                 fclose(archivo);
@@ -151,6 +223,7 @@ static void cargarSitiosDesdeArchivo(const char *rutaArchivo, int esInicial) {
     
     fclose(archivo);
     
+    //Reporte de resultados
     if (!esInicial) {
         printf("\n--- Resumen de carga ---\n");
         printf("Sitios agregados: %d\n", sitiosAgregados);
@@ -159,6 +232,17 @@ static void cargarSitiosDesdeArchivo(const char *rutaArchivo, int esInicial) {
     }
 }
 
+/*
+ * saveFile
+ *
+ * Objetivo: Tomar los valores en el arreglo y escribirlos en el archivo
+ *
+ * Entradas: Sin entradas
+ *
+ * Salidas: void
+ *
+ * Restricciones: Sin restricciones específicas
+ */
 void saveFile() {
     FILE *archivo;
     
@@ -168,7 +252,7 @@ void saveFile() {
         return;
     }
     
-    // Escribe cada sitio en el formato: nombre,ubicacion,web
+    // Escribe cada sitio en formato: nombre,ubicacion,web
     for (int i = 0; i < numSitios; i++) {
         fprintf(archivo, "%s,%s,%s\n", sitios[i].nombre, sitios[i].ubicacion, sitios[i].web);
     }
@@ -176,10 +260,33 @@ void saveFile() {
     fclose(archivo);
 }
 
+/*
+ * loadInitialSites
+ *
+ * Objetivo: Invoca cargarSitiosDesdeArchivo
+ *
+ * Entradas: Sin entradas
+ *
+ * Salidas: void
+ *
+ * Restricciones: Sin restricciones específicas
+ */
 void loadInitialSites() {
     cargarSitiosDesdeArchivo(RUTA_SITIOS, 1);
 }
 
+/*
+ * loadFile
+ *
+ * Objetivo: Carga un nuevo archivo de sitios para ingresarlos al sistema
+ *
+ * Entradas: rutaArchivo - Valor ingresado por el usuario que representa la dirección de
+ * acceso al archivo
+ *
+ * Salidas: void
+ *
+ * Restricciones: Se espera que la ruta de archivo exista en el equipo o fichero
+ */
 void loadFile() {
     char rutaArchivo[MAX_RUTA];
     
@@ -196,6 +303,18 @@ void loadFile() {
     saveFile();
 }
 
+/*
+ * editSite
+ *
+ * Objetivo: Ingresar a un sitio específico y modificar sus valores
+ *
+ * Entradas: siteName - Valor ingresado por el usuario para referencias el sitio elegido
+ *           newValue - Nuevo valor que será ingresado por el usuario para el atributo seleccionado
+ *
+ * Salidas: void
+ *
+ * Restricciones: Se espera que no queden espacios en blanco
+ */
 void editSite() {
     if (numSitios == 0) {
         printf("\nNo hay sitios disponibles para editar.\n");
@@ -210,19 +329,21 @@ void editSite() {
     printf("\nIngrese el nombre del sitio a modificar: ");
     fgets(siteName, sizeof(siteName), stdin);
 
+    //Elimina saltos de linea
     if (siteName[strlen(siteName) - 1] == '\n') {
         siteName[strlen(siteName) - 1] = '\0';
     }
     
     trimWhitespace(siteName);
     
-    siteIndex = findSiteIndexByName(siteName);
+    siteIndex = findSiteIndexByName(siteName); //Busca el índice del sitio
     
     if (siteIndex == -1) {
         printf("\nError: No se encontró el sitio '%s'.\n", siteName);
         return;
     }
 
+    //Se imprime la información del sitio
     printf("\n--- Información actual del sitio ---\n");
     printf("Nombre: %s\n", sitios[siteIndex].nombre);
     printf("Ubicación: %s\n", sitios[siteIndex].ubicacion);
@@ -244,12 +365,12 @@ void editSite() {
             if (newValue[strlen(newValue) - 1] == '\n') {
                 newValue[strlen(newValue) - 1] = '\0';
             }
-            trimWhitespace(newValue);
+            trimWhitespace(newValue); //Elimina espacios blancos en el nuevo valor
             
             if (strlen(newValue) == 0) {
                 printf("Error: El nombre no puede estar vacío.\n");
             } else {
-                strcpy(sitios[siteIndex].nombre, newValue);
+                strcpy(sitios[siteIndex].nombre, newValue); //Copia el nuevo valor en el lugar correspondiente
                 printf("Nombre actualizado correctamente.\n");
             }
             break;
@@ -290,16 +411,27 @@ void editSite() {
             return;
     }
     
-    saveFile();
+    saveFile(); //Guarda los nuevos datos
 }
 
+/*
+ * deleteSite
+ *
+ * Objetivo: Encontrar el sitio seleccionado y eliminarlo del archivo txt y del arreglo actual
+ *
+ * Entradas: siteName - Valor ingresado por el usuario para referencias el sitio elegido
+ *
+ * Salidas: void
+ *
+ * Restricciones: Sin restricciones específicas
+ */
 void deleteSite() {
     if (numSitios == 0) {
         printf("\nNo hay sitios disponibles para eliminar.\n");
         return;
     }
     
-    char siteName[50];
+    char siteName[MAX_NOMBRE];
     int siteIndex;
     int confirm;
     
@@ -349,6 +481,17 @@ void deleteSite() {
     }
 }
 
+/*
+ * showSites
+ *
+ * Objetivo: Recorre el arreglo de sitios y los imprime de uno en uno
+ *
+ * Entradas: sin entradas
+ *
+ * Salidas: void
+ *
+ * Restricciones: Sin restricciones específicas
+ */
 void showSites() {
     if (numSitios == 0) {
         printf("\nNo hay sitios registrados.\n");
@@ -377,6 +520,17 @@ void showSites() {
     printf("\n========================================\n");
 }
 
+/*
+ * manageSitesMenu
+ *
+ * Objetivo: Maneja el menú de opciones de sitios
+ *
+ * Entradas: option - Valor ingresado por el usuario para elegir una opcion
+ *
+ * Salidas: void
+ *
+ * Restricciones: Se espera un valor válido en las opciones
+ */
 void manageSitesMenu() {
     int option;
     

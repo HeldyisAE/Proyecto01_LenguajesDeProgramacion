@@ -5,19 +5,53 @@
 #include "siteManagement.h"
 #include "queryEvent.h"
 
+//Prototipo
 static int fechaToInt(char *f);
 
+/*
+ * limpiarBuffer
+ *
+ * Objetivo: Libera buffer después de un scanf
+ *
+ * Entradas: Sin entradas
+ *
+ * Salidas: void
+ *
+ * Restricciones: Sin restricciones específicas
+ */
 static void limpiarBuffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
+/*
+ * fechaToInt
+ *
+ * Objetivo: Convierte el texto de fecha ingresado en valores enteros
+ *
+ * Entradas: char *f - Representa la fecha ingresada
+ *
+ * Salidas: int - Devuelve la fecha en formato numérico
+ *
+ * Restricciones: Se espera que la fecha tenga el formato adecuado
+ */
 static int fechaToInt(char *f) {
     int d, m, a;
     sscanf(f, "%d/%d/%d", &d, &m, &a);
     return a * 10000 + m * 100 + d;
 }
 
+/*
+ * showEvents
+ *
+ * Objetivo: Mostrar los eventos registrados en el sistema
+ *
+ * Entradas: fechaFiltro - Representa la fecha ingresada de inicio ingresada por el usuario
+ *
+ * Salidas: void
+ *
+ * Restricciones: Se espera que ya hayan eventos registrados y que la fecha esté bien formateada
+ */
 void showEvents() {
     if (numEventos == 0) {
         printf("\nNo hay eventos registrados.\n");
@@ -42,7 +76,7 @@ void showEvents() {
     int indices[100];
     int count = 0;
 
-    // 🔹 Filtrar eventos
+    // Filtrar eventos
     for (int i = 0; i < numEventos; i++) {
         if (fechaToInt(eventos[i].fecha) >= fechaToInt(fechaFiltro)) {
             printf("%d. %s - %s\n", count + 1,
@@ -99,6 +133,7 @@ void showEvents() {
         int capacidad = s.sectores[i].capacidad;
         int ocupados = 0;
 
+        //Se obtienen los valores correspondientes a las facturas
         FILE *f = fopen("datos/facturas.txt", "r");
         if (f) {
             char linea[256];
