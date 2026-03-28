@@ -11,14 +11,14 @@ static void cifrarCesar(char *texto, int shift) {
 }
 
 void leerCredenciales(char user[], char password[]) {
-    FILE *file = fopen("datos/credenciales.json", "r");
+    FILE *file = fopen(RUTA_CREDENCIALES, "r");
 
     if (file == NULL) {
         printf("Error al abrir archivo\n");
         return;
     }
 
-    char buffer[200];
+    char buffer[SIZE_BUFFER_CREDENCIALES];
     size_t bytesLeidos = fread(buffer, sizeof(char), sizeof(buffer) - 1, file);
     buffer[bytesLeidos] = '\0';
 
@@ -38,8 +38,8 @@ void leerCredenciales(char user[], char password[]) {
 }
 
 int validate(char user[], char password[]) {
-    char userFile[50];
-    char passwordFile[50];
+    char userFile[MAX_USUARIO];
+    char passwordFile[MAX_PASSWORD];
 
     leerCredenciales(userFile, passwordFile);
 

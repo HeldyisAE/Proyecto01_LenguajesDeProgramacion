@@ -1,6 +1,14 @@
 #ifndef SITEMANAGEMENT_H
 #define SITEMANAGEMENT_H
 
+#define MAX_NOMBRE       50
+#define MAX_UBICACION    50
+#define MAX_WEB          50
+#define MAX_LINEA        200
+#define MAX_RUTA         256
+#define INCREMENTO_MEMORIA  5
+#define RUTA_SITIOS  "datos/sitios.txt"
+
 struct Site {
     char nombre[50];
     char ubicacion[50];

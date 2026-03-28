@@ -6,3 +6,6 @@
 6027|Ashley Z|Pintacaras|Graderia|49|500.00|28/03/2026
 6105|Kyra NK|Risas|Palco|20|2000.00|28/03/2026
 6213|Yurguen M|Risas|VIP|1|5000.00|28/03/2026
+2147|Juan David|Pintacaras|Graderia|35|500.00|28/03/2026
+2147|Juan David|Pintacaras|Graderia|34|500.00|28/03/2026
+1661|Lilas Ikuta|Paco y Lola|publico|14|1000.00|28/03/2026

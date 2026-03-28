@@ -6,7 +6,6 @@
 struct Site *sitios = NULL;
 int numSitios = 0;
 static int capacidad = 0;
-static const int INCREMENTO_MEMORIA = 5;
 
 static void limpiarBuffer();
 static int siteExists(const char *nombre);
@@ -74,8 +73,8 @@ static void limpiarBuffer() {
 
 static void cargarSitiosDesdeArchivo(const char *rutaArchivo, int esInicial) {
     FILE *archivo;
-    char linea[200];
-    char nombre[50], ubicacion[50], web[50];
+    char linea[MAX_LINEA];
+    char nombre[MAX_NOMBRE], ubicacion[MAX_UBICACION], web[MAX_WEB];
     int resultado;
     int sitiosAgregados = 0;
     int sitiosDuplicados = 0;
@@ -178,11 +177,11 @@ void saveFile() {
 }
 
 void loadInitialSites() {
-    cargarSitiosDesdeArchivo("datos/sitios.txt", 1);
+    cargarSitiosDesdeArchivo(RUTA_SITIOS, 1);
 }
 
 void loadFile() {
-    char rutaArchivo[256];
+    char rutaArchivo[MAX_RUTA];
     
     printf("Ingrese la dirección del archivo que desea cargar: ");
     fgets(rutaArchivo, sizeof(rutaArchivo), stdin);

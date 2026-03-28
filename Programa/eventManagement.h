@@ -3,6 +3,17 @@
 
 #include "siteManagement.h"
 
+#define RUTA_EVENTOS    "datos/eventos.txt"
+#define RUTA_SECTORES   "datos/sectores.txt"
+#define RUTA_PRECIOS    "datos/precios.txt"
+
+#define MAX_NOMBRE_EVENTO       100
+#define MAX_PRODUCTORA          100
+#define MAX_NOMBRE_SECTOR       30
+#define MAX_NOMBRE_SITIO        50
+#define MAX_FECHA_EVENTO        15
+#define MAX_HORA_EVENTO         10
+
 struct Sector {
     char nombre[30];
     char codigoInicial;

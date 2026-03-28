@@ -11,6 +11,10 @@
 #include "billing.h"
 #include "ventaBoletos.h"
 
+#define MAX_TRIES 5
+#define MAX_USER 50
+#define MAX_PASSWORD 50
+
 int main() {
     SetConsoleOutputCP(CP_UTF8);
     
@@ -19,9 +23,9 @@ int main() {
     loadSegments();
     loadPrices();
 
-    char user[50];
-    char password[50];
-    int tries = 5;
+    char user[MAX_USER];
+    char password[MAX_PASSWORD];
+    int tries = MAX_TRIES;
     int access = 0;
     
     for(;;) {

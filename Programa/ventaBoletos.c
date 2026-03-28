@@ -20,9 +20,9 @@ static int asientoYaVendido(char *nombreEvento, char *nombreSector, int asiento)
     FILE *f = fopen("datos/facturas.txt", "r");
     if (!f) return 0; //0 es libre, 1 es ocupado
 
-    char linea[256];
+    char linea[MAX_LINEA_FACTURA];
     int id, asientoFile;
-    char cliente[50], evento[100], sector[50], fecha[15];
+    char cliente[MAX_NOMBRE_CLIENTE], evento[MAX_NOMBRE_EVENTO], sector[MAX_NOMBRE_SECTOR], fecha[MAX_FECHA];
     float precio;
 
     while (fgets(linea, sizeof(linea), f)) {
@@ -47,7 +47,7 @@ static int asientoYaVendido(char *nombreEvento, char *nombreSector, int asiento)
 
 void procesoCompra() {
     if (numEventos == 0) {
-        printf("\n ! No hay eventos disponibles.\n");
+        printf("\n! No hay eventos disponibles.\n");
         return;
     }
 
@@ -59,65 +59,106 @@ void procesoCompra() {
     int selEv;
     printf("Seleccione un evento: ");
     scanf("%d", &selEv);
-    int evIdx = selEv - 1;
-    int sitIdx = eventos[evIdx].idSitio;
+    int evIndex = selEv - 1;
+    int sitIndex = eventos[evIndex].idSitio;
 
-    printf("\nSECTORES en %s:\n", sitios[sitIdx].nombre);
-    for (int j = 0; j < sitios[sitIdx].numSectores; j++) {
-
-        printf("%d. %s (Precio: %.2f)\n", j + 1, sitios[sitIdx].sectores[j].nombre, eventos[evIdx].preciosSectores[j]);
+    printf("\nSECTORES en %s:\n", sitios[sitIndex].nombre);
+    for (int j = 0; j < sitios[sitIndex].numSectores; j++) {
+        printf("%d. %s (Precio: %.2f)\n",
+               j + 1,
+               sitios[sitIndex].sectores[j].nombre,
+               eventos[evIndex].preciosSectores[j]);
     }
 
     int selSec;
     printf("Seleccione sector: ");
-    if (scanf("%d", &selSec) != 1) {
-        printf("Entrada invalida. Debe ingresar un numero.\n");
-        while (getchar() != '\n'); 
-        return;
-    }
-    int secIdx = selSec - 1;
+    scanf("%d", &selSec);
+    int secIndex = selSec - 1;
 
-    char nombreC[50];
+    char nombreC[MAX_NOMBRE_CLIENTE];
+    char cedula[MAX_CEDULA];
+
     printf("\nNombre del cliente: ");
-    getchar(); 
+    getchar();
     fgets(nombreC, 50, stdin);
     nombreC[strcspn(nombreC, "\n")] = 0;
 
-    int asiento;
-    printf("\nNumero de asiento (1 a %d): ", sitios[sitIdx].sectores[secIdx].capacidad);
-    scanf("%d", &asiento);
+    printf("Cedula: ");
+    scanf("%19s", cedula);
 
-    // Validación de rango
-    if (asiento < 1 || asiento > sitios[sitIdx].sectores[secIdx].capacidad) {
-        printf("Asiento invalido.\n");
-        return;
+    int cantidad;
+    printf("\n¿Cuantos boletos desea comprar?: ");
+    scanf("%d", &cantidad);
+
+    int asientos[MAX_ASIENTOS];
+    float precio = eventos[evIndex].preciosSectores[secIndex];
+
+    float subtotal = 0;
+
+    for (int i = 0; i < cantidad; i++) {
+        printf("Asiento #%d (1 a %d): ", i + 1, sitios[sitIndex].sectores[secIndex].capacidad);
+
+        scanf("%d", &asientos[i]);
+
+        if (asientos[i] < 1 ||
+            asientos[i] > sitios[sitIndex].sectores[secIndex].capacidad) {
+            printf("Asiento invalido.\n");
+            return;
+        }
+
+        if (asientoYaVendido(eventos[evIndex].nombre, sitios[sitIndex].sectores[secIndex].nombre, asientos[i])) {
+
+            printf("El asiento %d ya fue vendido.\n", asientos[i]);
+            return;
+        }
+
+        subtotal += precio;
     }
 
-    // Validación de venta
-    if (asientoYaVendido(
-            eventos[evIdx].nombre,
-            sitios[sitIdx].sectores[secIdx].nombre,
-            asiento)) {
+    float servicio = subtotal * 0.05;
+    float total = subtotal + servicio;
 
-        printf("El asiento ya fue vendido.\n");
-        return;
-    }
+    char fechaCompra[MAX_FECHA];
+    obtenerFechaActual(fechaCompra);
 
-    char fecha[15];
-    obtenerFechaActual(fecha);
+    int id = rand() % 9000 + 1000;
 
     FILE *f = fopen("datos/facturas.txt", "a");
     if (f) {
-        int id = rand() % 9000 + 1000;
-        fprintf(f, "%d|%s|%s|%s|%d|%.2f|%s\n",
-                id,
-                nombreC,
-                eventos[evIdx].nombre,
-                sitios[sitIdx].sectores[secIdx].nombre,
-                asiento,
-                eventos[evIdx].preciosSectores[secIdx],
-                fecha);
+        for (int i = 0; i < cantidad; i++) {
+            fprintf(f, "%d|%s|%s|%s|%d|%.2f|%s\n",
+                    id,
+                    nombreC,
+                    eventos[evIndex].nombre,
+                    sitios[sitIndex].sectores[secIndex].nombre,
+                    asientos[i],
+                    precio,
+                    fechaCompra);
+        }
         fclose(f);
-        printf("\n[OK] Venta registrada. Factura #%d generada.\n", id);
     }
+
+    // ============================
+    // Imprimir factura
+    // ============================
+
+    printf("\n=========== FACTURA ===========\n");
+    printf("ID Factura: %d\n", id);
+    printf("Fecha compra: %s\n", fechaCompra);
+    printf("Cedula: %s\n", cedula);
+    printf("Cliente: %s\n", nombreC);
+    printf("Evento: %s\n", eventos[evIndex].nombre);
+    printf("Productora: %s\n", eventos[evIndex].productora);
+    printf("Sitio: %s\n", sitios[sitIndex].nombre);
+    printf("Fecha evento: %s\n", eventos[evIndex].fecha);
+
+    printf("\n--- DETALLE ---\n");
+    for (int i = 0; i < cantidad; i++) {
+        printf("Asiento %d - %.2f\n", asientos[i], precio);
+    }
+
+    printf("\nSubtotal: %.2f\n", subtotal);
+    printf("Servicio (5%%): %.2f\n", servicio);
+    printf("TOTAL: %.2f\n", total);
+    printf("================================\n");
 }
