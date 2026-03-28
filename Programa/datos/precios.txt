@@ -1,2 +1,5 @@
-Ernesto Show|0|5000.00
-Ernesto Show|1|1240.00
+Tia Panchita|0|7000.00
+Tia Panchita|1|5000.00
+Tia Panchita|2|2500.00
+Tia Panchita|3|1000.00
+Expo Pintura|0|500.00

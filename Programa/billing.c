@@ -2,10 +2,178 @@
 #include <stdlib.h>
 #include <string.h>
 #include "billing.h"
+#include "eventManagement.h"
 
-// =========================================================
-// Ventas echas
-// =========================================================
+void topMeses() {
+    struct MesStats meses[100];
+    int count = 0;
+
+    for (int i = 0; i < numEventos; i++) {
+        char mesAnio[10];
+
+        strncpy(mesAnio, eventos[i].fecha + 3, 7);
+        mesAnio[7] = '\0';
+
+        int encontrado = -1;
+
+        for (int j = 0; j < count; j++) {
+            if (strcmp(meses[j].mesAnio, mesAnio) == 0) {
+                encontrado = j;
+                break;
+            }
+        }
+
+        if (encontrado != -1) {
+            meses[encontrado].cantidad++;
+        } else if (count < 100) {
+            strcpy(meses[count].mesAnio, mesAnio);
+            meses[count].cantidad = 1;
+            count++;
+        }
+    }
+
+    // Ordena
+    for (int i = 0; i < count - 1; i++) {
+        for (int j = 0; j < count - i - 1; j++) {
+            if (meses[j].cantidad < meses[j + 1].cantidad) {
+                struct MesStats temp = meses[j];
+                meses[j] = meses[j + 1];
+                meses[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("\nTop 3 meses con mas eventos:\n");
+    for (int i = 0; i < 3 && i < count; i++) {
+        printf("%s -> %d eventos\n", meses[i].mesAnio, meses[i].cantidad);
+    }
+}
+
+void topProductoras() {
+    struct ProductoraStats prod[100];
+    int count = 0;
+
+    FILE *f = fopen("datos/facturas.txt", "r");
+    if (!f) return;
+
+    int id, asiento;
+    char cliente[50], eventoNombre[100], sector[30], fecha[15];
+    float monto;
+
+    while (fscanf(f, "%d|%[^|]|%[^|]|%[^|]|%d|%f|%[^|\n]",
+                  &id, cliente, eventoNombre, sector, &asiento, &monto, fecha) == 7) {
+
+        for (int i = 0; i < numEventos; i++) {
+            if (strcmp(eventos[i].nombre, eventoNombre) == 0) {
+
+                char *prodNombre = eventos[i].productora;
+                int encontrado = -1;
+
+                for (int j = 0; j < count; j++) {
+                    if (strcmp(prod[j].nombre, prodNombre) == 0) {
+                        encontrado = j;
+                        break;
+                    }
+                }
+
+                if (encontrado != -1) {
+                    prod[encontrado].recaudacion += monto;
+                } else if (count < 100) {
+                    strcpy(prod[count].nombre, prodNombre);
+                    prod[count].recaudacion = monto;
+                    count++;
+                }
+
+                break;
+            }
+        }
+    }
+
+    fclose(f);
+
+    // Ordena
+    for (int i = 0; i < count - 1; i++) {
+        for (int j = 0; j < count - i - 1; j++) {
+            if (prod[j].recaudacion < prod[j + 1].recaudacion) {
+                struct ProductoraStats temp = prod[j];
+                prod[j] = prod[j + 1];
+                prod[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("\nTop 3 productoras:\n");
+    for (int i = 0; i < 3 && i < count; i++) {
+        printf("%s -> %.2f CRC\n", prod[i].nombre, prod[i].recaudacion);
+    }
+}
+
+void estadisticasSitios() {
+    struct SitioStats stats[100];
+
+    for (int i = 0; i < numSitios; i++) {
+        strcpy(stats[i].nombre, sitios[i].nombre);
+        stats[i].cantidadEventos = 0;
+        stats[i].recaudacion = 0;
+    }
+
+    // Cuenta eventos por sitio
+    for (int i = 0; i < numEventos; i++) {
+        for (int j = 0; j < numSitios; j++) {
+            if (eventos[i].idSitio == j) {
+                stats[j].cantidadEventos++;
+                break;
+            }
+        }
+    }
+
+    FILE *f = fopen("datos/facturas.txt", "r");
+    if (!f) return;
+
+    int id, asiento;
+    char cliente[50], eventoNombre[100], sector[30], fecha[15];
+    float monto;
+
+    while (fscanf(f, "%d|%[^|]|%[^|]|%[^|]|%d|%f|%[^|\n]",
+                  &id, cliente, eventoNombre, sector, &asiento, &monto, fecha) == 7) {
+
+        for (int i = 0; i < numEventos; i++) {
+            if (strcmp(eventos[i].nombre, eventoNombre) == 0) {
+
+                for (int j = 0; j < numSitios; j++) {
+                    if (eventos[i].idSitio == j) {
+                        stats[j].recaudacion += monto;
+                        break;
+                    }
+                }
+
+                break;
+            }
+        }
+    }
+
+    fclose(f);
+
+    // Ordena por recaudación
+    for (int i = 0; i < numSitios - 1; i++) {
+        for (int j = 0; j < numSitios - i - 1; j++) {
+            if (stats[j].recaudacion < stats[j + 1].recaudacion) {
+                struct SitioStats temp = stats[j];
+                stats[j] = stats[j + 1];
+                stats[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("\nSitios:\n");
+    for (int i = 0; i < numSitios; i++) {
+        printf("%s -> Eventos: %d | Recaudacion: %.2f\n",
+               stats[i].nombre,
+               stats[i].cantidadEventos,
+               stats[i].recaudacion);
+    }
+}
+
 void mostrarListaFacturas() {
     FILE *f = fopen("datos/facturas.txt", "r");
     if (!f) {
@@ -13,56 +181,61 @@ void mostrarListaFacturas() {
         return;
     }
 
-    printf("\n==========================================================\n");
-    printf("                HISTORIAL DE FACTURAS\n");
-    printf("==========================================================\n");
-    printf("%-5s | %-15s | %-15s | %-10s\n", "ID", "Cliente", "Evento", "Monto");
-    printf("----------------------------------------------------------\n");
-
     int id, asiento;
-    char cliente[50], evento[100], sector[30];
-    float monto;
+    char cliente[50], evento[100], sector[30], fecha[15];
+    float subtotal;
 
-    while (fscanf(f, "%d|%[^|]|%[^|]|%[^|]|%d|%f\n", &id, cliente, evento, sector, &asiento, &monto) != EOF) {
-        printf("%-5d | %-15.15s | %-15.15s | %-10.2f\n", id, cliente, evento, monto);
+    printf("\n====================================================================\n");
+    printf("                     HISTORIAL DE FACTURAS\n");
+    printf("====================================================================\n");
+
+    while (fscanf(f, "%d|%[^|]|%[^|]|%[^|]|%d|%f|%[^|\n]",
+                  &id, cliente, evento, sector, &asiento, &subtotal, fecha) == 7) {
+
+        printf("%-5d | %-20.20s | %-12s | %-15.15s | %-10.2f\n",
+               id, evento, fecha, cliente, subtotal);
     }
 
     fclose(f);
-    printf("==========================================================\n");
 }
 
-// =========================================================
 void mostrarEstadisticas() {
     FILE *f = fopen("datos/facturas.txt", "r");
     if (!f) {
-        printf("\n[!] No hay datos suficientes para generar estadisticas.\n");
+        printf("\n[!] No hay datos suficientes.\n");
         return;
     }
 
-    float recaudacionTotal = 0;
-    int totalBoletos = 0;
-    
+    float total = 0;
+    int cantidad = 0;
+
     int id, asiento;
-    char cliente[50], evento[100], sector[30];
-    float monto;
+    char cliente[50], evento[100], sector[30], fecha[15];
+    float subtotal;
 
-    // esto es para encontrar el evento mas vendido
-    char eventoMasVendido[100] = "N/A";
-    int maxVentas = 0;
+    while (fscanf(f, "%d|%[^|]|%[^|]|%[^|]|%d|%f|%[^|\n]",
+                  &id, cliente, evento, sector, &asiento, &subtotal, fecha) == 7) {
 
-    while (fscanf(f, "%d|%[^|]|%[^|]|%[^|]|%d|%f\n", &id, cliente, evento, sector, &asiento, &monto) != EOF) {
-        recaudacionTotal += monto;
-        totalBoletos++;
+        total += subtotal;
+        cantidad++;
     }
+
     fclose(f);
 
     printf("\n==========================================\n");
-    printf("         REPORTE DE ESTADISTICAS\n");
+    printf("               REPORTE\n");
     printf("==========================================\n");
-    printf("  Total de boletos vendidos : %d\n", totalBoletos);
-    printf("  Recaudacion Total Bruta   : %.2f CRC\n", recaudacionTotal);
-    if (totalBoletos > 0) {
-        printf("  Promedio por factura      : %.2f CRC\n", recaudacionTotal / totalBoletos);
+    printf("Total de facturas: %d\n", cantidad);
+    printf("Recaudacion total: %.2f CRC\n", total);
+
+    if (cantidad > 0) {
+        printf("Promedio: %.2f CRC\n", total / cantidad);
     }
+
     printf("==========================================\n");
+
+    printf("\n===== DETALLE ESTADÍSTICO =====\n");
+    topMeses();
+    topProductoras();
+    estadisticasSitios();
 }

@@ -6,6 +6,15 @@
 #include "eventManagement.h"
 #include "siteManagement.h"
 
+static void obtenerFechaActual(char *buffer);
+
+static void obtenerFechaActual(char *buffer) {
+    time_t t = time(NULL);
+    struct tm *tm = localtime(&t);
+
+    strftime(buffer, 15, "%d/%m/%Y", tm);
+}
+
 void procesoCompra() {
     if (numEventos == 0) {
         printf("\n ! No hay eventos disponibles.\n");
@@ -48,14 +57,20 @@ void procesoCompra() {
     printf("\nNumero de asiento (1 a %d): ", sitios[sitIdx].sectores[secIdx].capacidad);
     scanf("%d", &asiento);
 
+    char fecha[15];
+    obtenerFechaActual(fecha);
 
     FILE *f = fopen("datos/facturas.txt", "a");
     if (f) {
         int id = rand() % 9000 + 1000;
-        fprintf(f, "%d|%s|%s|%s|%d|%.2f\n", 
-                id, nombreC, eventos[evIdx].nombre, 
-                sitios[sitIdx].sectores[secIdx].nombre, asiento, 
-                eventos[evIdx].preciosSectores[secIdx]);
+        fprintf(f, "%d|%s|%s|%s|%d|%.2f|%s\n",
+                id,
+                nombreC,
+                eventos[evIdx].nombre,
+                sitios[sitIdx].sectores[secIdx].nombre,
+                asiento,
+                eventos[evIdx].preciosSectores[secIdx],
+                fecha);
         fclose(f);
         printf("\n[OK] Venta registrada. Factura #%d generada.\n", id);
     }

@@ -204,7 +204,6 @@ static void cargarEventosDesdeArchivo(const char *rutaArchivo) {
     }
 
     fclose(f);
-    printf("Eventos cargados: %d\n", numEventos);
 }
 
 void loadEvents() {
@@ -318,7 +317,6 @@ static void cargarSectoresDesdeArchivo(const char *rutaArchivo) {
     }
 
     fclose(f);
-    printf("Sectores cargados correctamente.\n");
 }
 
 void loadSegments() {
