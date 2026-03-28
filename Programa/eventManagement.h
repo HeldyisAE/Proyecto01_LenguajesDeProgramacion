@@ -28,5 +28,6 @@ void guardarSectores();
 void guardarEventos();
 void loadEvents();
 void loadSegments();
+void savePrices();
 
 #endif

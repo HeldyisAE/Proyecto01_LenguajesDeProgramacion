@@ -21,5 +21,8 @@ void deleteSite();
 void showSites();
 void loadInitialSites();
 void saveFile();
+void savePrices();
+void loadPrices();
+
 
 #endif

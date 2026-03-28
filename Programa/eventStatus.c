@@ -1,6 +1,9 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "eventStatus.h"
 #include "eventManagement.h"
+#include "siteManagement.h"
 
 void eventInfo(int index) {
     int sitioIndice = eventos[index].idSitio;
@@ -24,25 +27,66 @@ void sectorInfo(int index) {
 
         float precio;
 
+        // 🔹 Precio (evento o base)
         if (eventos[index].preciosSectores != NULL) {
             precio = eventos[index].preciosSectores[i];
         } else {
             precio = s.precioBase;
         }
 
+        // 🔹 Crear arreglo de ocupación
+        int *ocupados = (int *)calloc(s.capacidad, sizeof(int));
+        if (!ocupados) {
+            printf("Error de memoria\n");
+            return;
+        }
+
+        float total = 0;
+
+        // 🔹 Leer archivo de ventas
+        FILE *f = fopen("datos/facturas.txt", "r");
+        if (f) {
+            char linea[256];
+            char nombreEv[100], nombreSec[50], cliente[50];
+            int id, asiento;
+            float precioVenta;
+
+            while (fgets(linea, sizeof(linea), f)) {
+                linea[strcspn(linea, "\n")] = 0;
+
+                if (sscanf(linea, "%d|%49[^|]|%99[^|]|%49[^|]|%d|%f",
+                           &id, cliente, nombreEv, nombreSec, &asiento, &precioVenta) == 6) {
+
+                    // 🔹 Verifica si coincide evento y sector
+                    if (strcmp(nombreEv, eventos[index].nombre) == 0 &&
+                        strcmp(nombreSec, s.nombre) == 0) {
+
+                        if (asiento >= 1 && asiento <= s.capacidad) {
+                            ocupados[asiento - 1] = 1;
+                            total += precioVenta;
+                        }
+                    }
+                }
+            }
+            fclose(f);
+        }
+
+        // 🔹 Mostrar info del sector
         printf("\nSector: %s\n", s.nombre);
         printf("Precio por asiento: %.2f\n", precio);
-
-        // Aun no hay ventas
-        printf("Monto recaudado: 0.00\n");
+        printf("Monto recaudado: %.2f\n", total);
 
         printf("Asientos:\n");
 
-        //Todo está disponible porque aun no hay lógica de venta
         for (int j = 0; j < s.capacidad; j++) {
-            printf("%c%d - Disponible\n", s.codigoInicial, j + 1);
+            if (ocupados[j]) {
+                printf("%c%d - Ocupado\n", s.codigoInicial, j + 1);
+            } else {
+                printf("%c%d - Disponible\n", s.codigoInicial, j + 1);
+            }
         }
-        
+
+        free(ocupados);
     }
 }
 
@@ -60,7 +104,11 @@ void printEventStatus() {
 
     int option;
     printf("Seleccione un evento: ");
-    scanf("%d", &option);
+    if (scanf("%d", &option) != 1) {
+        printf("Entrada invalida.\n");
+        while (getchar() != '\n');
+        return;
+    }
 
     if (option < 1 || option > numEventos) {
         printf(" ! Seleccion invalida.\n");

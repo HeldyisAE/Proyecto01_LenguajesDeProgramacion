@@ -154,6 +154,7 @@ void gestionarEventos() {
     numEventos++;
     printf("\nEvento registrado.\n");
     guardarEventos();
+    savePrices();
 }
 
 
@@ -198,8 +199,7 @@ static void cargarEventosDesdeArchivo(const char *rutaArchivo) {
         strcpy(eventos[numEventos].hora, hora);
         eventos[numEventos].idSitio = idSitio;
 
-        eventos[numEventos].preciosSectores = NULL; // Importante
-
+        eventos[numEventos].preciosSectores = NULL;
         numEventos++;
     }
 
@@ -211,6 +211,53 @@ void loadEvents() {
     cargarEventosDesdeArchivo("datos/eventos.txt");
 }
 
+void savePrices() {
+    FILE *f = fopen("datos/precios.txt", "w");
+    if (!f) return;
+    for (int i = 0; i < numEventos; i++) {
+        if (eventos[i].preciosSectores == NULL) continue;
+        int nSect = sitios[eventos[i].idSitio].numSectores;
+        for (int j = 0; j < nSect; j++) {
+            fprintf(f, "%s|%d|%.2f\n", eventos[i].nombre, j, 
+                    eventos[i].preciosSectores[j]);
+        }
+    }
+    fclose(f);
+}
+
+void loadPrices() {
+    FILE *f = fopen("datos/precios.txt", "r");
+    if (!f) return;
+
+    char linea[256], nombreEvento[100];
+    int secIdx;
+    float precio;
+
+    while (fgets(linea, sizeof(linea), f)) {
+        linea[strcspn(linea, "\n")] = 0;
+        if (strlen(linea) == 0) continue;
+
+        if (sscanf(linea, "%99[^|]|%d|%f", nombreEvento, &secIdx, &precio) != 3)
+            continue;
+
+        // Buscar el evento por nombre
+        for (int i = 0; i < numEventos; i++) {
+            if (strcmp(eventos[i].nombre, nombreEvento) == 0) {
+                int nSect = sitios[eventos[i].idSitio].numSectores;
+
+                // Alojar si aún no se ha hecho
+                if (eventos[i].preciosSectores == NULL) {
+                    eventos[i].preciosSectores = calloc(nSect, sizeof(float));
+                }
+
+                if (secIdx >= 0 && secIdx < nSect)
+                    eventos[i].preciosSectores[secIdx] = precio;
+                break;
+            }
+        }
+    }
+    fclose(f);
+}
 
 static void cargarSectoresDesdeArchivo(const char *rutaArchivo) {
     FILE *f = fopen(rutaArchivo, "r");

@@ -17,7 +17,15 @@ int main() {
     loadInitialSites();
     loadEvents();
     loadSegments();
-    
+    loadPrices();
+
+    for (int i = 0; i < numEventos; i++) {
+        if (eventos[i].preciosSectores == NULL)
+            printf("Evento %s SIN precios\n", eventos[i].nombre);
+        else
+            printf("Evento %s OK precios\n", eventos[i].nombre);
+    }
+
     char user[50];
     char password[50];
     int tries = 5;

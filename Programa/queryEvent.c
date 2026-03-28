@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "eventManagement.h"
 #include "siteManagement.h"
 #include "queryEvent.h"
@@ -41,9 +42,8 @@ void showEvents() {
     int indices[100];
     int count = 0;
 
-    // Filtro de eventos por punto de fecha en adelante
+    // 🔹 Filtrar eventos
     for (int i = 0; i < numEventos; i++) {
-
         if (fechaToInt(eventos[i].fecha) >= fechaToInt(fechaFiltro)) {
             printf("%d. %s - %s\n", count + 1,
                    eventos[i].nombre,
@@ -96,12 +96,38 @@ void showEvents() {
             precio = s.sectores[i].precioBase;
         }
 
+        int capacidad = s.sectores[i].capacidad;
+        int ocupados = 0;
+
+        FILE *f = fopen("datos/facturas.txt", "r");
+        if (f) {
+            char linea[256];
+            char nombreEv[100], nombreSec[50], cliente[50];
+            int id, asiento;
+            float precioVenta;
+
+            while (fgets(linea, sizeof(linea), f)) {
+                linea[strcspn(linea, "\n")] = 0;
+
+                if (sscanf(linea, "%d|%49[^|]|%99[^|]|%49[^|]|%d|%f",
+                           &id, cliente, nombreEv, nombreSec, &asiento, &precioVenta) == 6) {
+
+                    if (strcmp(nombreEv, e.nombre) == 0 &&
+                        strcmp(nombreSec, s.sectores[i].nombre) == 0) {
+
+                        ocupados++;
+                    }
+                }
+            }
+            fclose(f);
+        }
+
+        int disponibles = capacidad - ocupados;
+        if (disponibles < 0) disponibles = 0;
+
         printf("\nSector: %s\n", s.sectores[i].nombre);
         printf("Precio por asiento: %.2f\n", precio);
-
-        // FALTA LOGICA DE COMPRA
-        printf("Asientos disponibles: %d\n",
-               s.sectores[i].capacidad);
+        printf("Asientos disponibles: %d\n", disponibles);
     }
 
     printf("\n=======================================\n");
