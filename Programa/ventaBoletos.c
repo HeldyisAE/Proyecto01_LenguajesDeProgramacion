@@ -7,12 +7,42 @@
 #include "siteManagement.h"
 
 static void obtenerFechaActual(char *buffer);
+static int asientoYaVendido(char *nombreEvento, char *nombreSector, int asiento);
 
 static void obtenerFechaActual(char *buffer) {
     time_t t = time(NULL);
     struct tm *tm = localtime(&t);
 
     strftime(buffer, 15, "%d/%m/%Y", tm);
+}
+
+static int asientoYaVendido(char *nombreEvento, char *nombreSector, int asiento) {
+    FILE *f = fopen("datos/facturas.txt", "r");
+    if (!f) return 0; //0 es libre, 1 es ocupado
+
+    char linea[256];
+    int id, asientoFile;
+    char cliente[50], evento[100], sector[50], fecha[15];
+    float precio;
+
+    while (fgets(linea, sizeof(linea), f)) {
+        linea[strcspn(linea, "\n")] = 0;
+
+        if (sscanf(linea, "%d|%49[^|]|%99[^|]|%49[^|]|%d|%f|%14[^|]",
+                   &id, cliente, evento, sector, &asientoFile, &precio, fecha) == 7) {
+
+            if (strcmp(evento, nombreEvento) == 0 &&
+                strcmp(sector, nombreSector) == 0 &&
+                asientoFile == asiento) {
+
+                fclose(f);
+                return 1; 
+            }
+        }
+    }
+
+    fclose(f);
+    return 0; 
 }
 
 void procesoCompra() {
@@ -56,6 +86,22 @@ void procesoCompra() {
     int asiento;
     printf("\nNumero de asiento (1 a %d): ", sitios[sitIdx].sectores[secIdx].capacidad);
     scanf("%d", &asiento);
+
+    // Validación de rango
+    if (asiento < 1 || asiento > sitios[sitIdx].sectores[secIdx].capacidad) {
+        printf("Asiento invalido.\n");
+        return;
+    }
+
+    // Validación de venta
+    if (asientoYaVendido(
+            eventos[evIdx].nombre,
+            sitios[sitIdx].sectores[secIdx].nombre,
+            asiento)) {
+
+        printf("El asiento ya fue vendido.\n");
+        return;
+    }
 
     char fecha[15];
     obtenerFechaActual(fecha);

@@ -12,67 +12,164 @@ static void limpiarBuffer() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
+void generarAsientos(struct Sector *sec) {
+    sec->asientos = (char **)malloc(sec->capacidad * sizeof(char*));
+
+    for (int i = 0; i < sec->capacidad; i++) {
+        sec->asientos[i] = (char *)malloc(10 * sizeof(char));
+        sprintf(sec->asientos[i], "%c%d", sec->codigoInicial, i + 1);
+    }
+}
+
+void liberarAsientos(struct Sector *sec) {
+    for (int i = 0; i < sec->capacidad; i++) {
+        free(sec->asientos[i]);
+    }
+    free(sec->asientos);
+}
+
 // =========================================================
 // GESTIÓN DE ESPACIOS (SECTORES)
 // =========================================================
 void gestionarSectores() {
+    int opcion;
+
+    do {
+        printf("\n--- GESTION DE SECTORES ---\n");
+        printf("1. Ver sitios y sectores\n");
+        printf("2. Agregar sector a sitio\n");
+        printf("3. Resetear sectores de un sitio\n");
+        printf("0. Volver\n");
+        printf("> ");
+        scanf("%d", &opcion);
+        limpiarBuffer();
+
+        switch (opcion) {
+            case 1:
+                mostrarSitiosYSectores();
+                break;
+            case 2:
+                agregarSectorASitio();
+                break;
+            case 3:
+                resetearSectores();
+                break;
+        }
+
+    } while (opcion != 0);
+}
+
+void mostrarSitiosYSectores() {
+    for (int i = 0; i < numSitios; i++) {
+        printf("\nSitio: %s\n", sitios[i].nombre);
+
+        if (sitios[i].numSectores == 0) {
+            printf("  (Sin sectores)\n");
+            continue;
+        }
+
+        for (int j = 0; j < sitios[i].numSectores; j++) {
+            struct Sector *sec = &sitios[i].sectores[j];
+
+            printf("  Sector: %s | Capacidad: %d | Precio: %.2f\n",
+                   sec->nombre, sec->capacidad, sec->precioBase);
+
+            printf("    Asientos: ");
+            for (int k = 0; k < sec->capacidad; k++) {
+                printf("\n    %s ", sec->asientos[k]);
+                printf("\n");
+            }
+            printf("\n");
+        }
+    }
+}
+
+void agregarSectorASitio() {
     if (numSitios == 0) {
-        printf("\n ! No hay sitios registrados. Primero debe crear un sitio.\n");
+        printf("No hay sitios.\n");
         return;
     }
 
-    printf("\n--- CONFIGURACION DE ESPACIOS y SECTORES ---\n");
     for (int i = 0; i < numSitios; i++) {
         printf("%d. %s\n", i + 1, sitios[i].nombre);
     }
-    
+
     int sel;
-    printf("Seleccione el lugar: ");
-    if (scanf("%d", &sel) != 1 || sel < 1 || sel > numSitios) {
-        printf(" ! Seleccion invalida.\n");
-        limpiarBuffer();
-        return;
-    }
+    printf("\nSeleccione el sitio: ");
+    scanf("%d", &sel);
     limpiarBuffer();
 
     int idx = sel - 1;
-    int cant;
-    printf("¿Cuantos sectores desea agregar a '%s'?: ", sitios[idx].nombre);
-    scanf("%d", &cant);
+
+    struct Site *s = &sitios[idx];
+
+    struct Sector *temp = realloc(s->sectores,
+        (s->numSectores + 1) * sizeof(struct Sector));
+
+    if (!temp) return;
+
+    s->sectores = temp;
+
+    int sectoresToAdd;
+
+    printf("\n¿Cuántos sectores desea agregar?: ");
+    scanf("%d", &sectoresToAdd);
     limpiarBuffer();
 
-    struct Sector *temp = (struct Sector *)realloc(sitios[idx].sectores, 
-                            (sitios[idx].numSectores + cant) * sizeof(struct Sector));
+    for(int i = 0; i < sectoresToAdd; i++) {
 
-    if (temp == NULL) {
-        printf(" ! Error de memoria.\n");
-        return;
-    }
-    sitios[idx].sectores = temp;
+        struct Sector *nuevo = &s->sectores[s->numSectores];
 
-    for (int i = 0; i < cant; i++) {
-        int n = sitios[idx].numSectores;
-        printf("\nConfigurando Sector #%d:\n", n + 1);
-        
-        printf("  Nombre (VIP, Sol, etc): ");
-        fgets(sitios[idx].sectores[n].nombre, 30, stdin);
-        sitios[idx].sectores[n].nombre[strcspn(sitios[idx].sectores[n].nombre, "\n")] = 0;
+        printf("\n--- Sector %d ---\n", i + 1);
 
-        printf("  Letra identificadora (A, B...): ");
-        scanf(" %c", &sitios[idx].sectores[n].codigoInicial);
+        printf("\nNombre sector: ");
+        fgets(nuevo->nombre, 30, stdin);
+        nuevo->nombre[strcspn(nuevo->nombre, "\n")] = 0;
 
-        printf("  Capacidad: ");
-        scanf("%d", &sitios[idx].sectores[n].capacidad);
+        printf("\nInicial identificadora: ");
+        scanf(" %c", &nuevo->codigoInicial);
 
-        printf("  Precio base: ");
-        scanf("%f", &sitios[idx].sectores[n].precioBase);
+        printf("\nCapacidad: ");
+        scanf("%d", &nuevo->capacidad);
+
+        printf("\nPrecio base: ");
+        scanf("%f", &nuevo->precioBase);
         limpiarBuffer();
 
-        sitios[idx].numSectores++;
+        generarAsientos(nuevo);
+
+        s->numSectores++;
+
+        guardarSectores();
+
+        printf("Sector agregado correctamente.\n");
+    }
+}
+
+void resetearSectores() {
+    for (int i = 0; i < numSitios; i++) {
+        printf("%d. %s\n", i + 1, sitios[i].nombre);
     }
 
-    printf("\nSectores configurados.\n");
+    int sel;
+    printf("Seleccione sitio: ");
+    scanf("%d", &sel);
+    limpiarBuffer();
+
+    int idx = sel - 1;
+    struct Site *s = &sitios[idx];
+
+    for (int i = 0; i < s->numSectores; i++) {
+        liberarAsientos(&s->sectores[i]);
+    }
+
+    free(s->sectores);
+    s->sectores = NULL;
+    s->numSectores = 0;
+
     guardarSectores();
+
+    printf("Sectores eliminados.\n");
 }
 
 // =========================================================
@@ -312,6 +409,8 @@ static void cargarSectoresDesdeArchivo(const char *rutaArchivo) {
         s->sectores[n].codigoInicial = codigo;
         s->sectores[n].capacidad = capacidad;
         s->sectores[n].precioBase = precio;
+
+        generarAsientos(&s->sectores[n]); 
 
         s->numSectores++;
     }

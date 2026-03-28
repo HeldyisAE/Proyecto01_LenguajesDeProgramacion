@@ -29,6 +29,8 @@ int main() {
         switch (option1)
         {
         case 1:
+            access = 0;
+            tries = 5;
             while (tries > 0 && !access) {
                 printf("Ingrese su usuario: ");
                 scanf("%49s", user);
@@ -44,6 +46,7 @@ int main() {
                 }
             }
             if(access) {
+
                 for(;;) {
                     int option2 = menuAdmin();
                     switch (option2)

@@ -1,5 +1,6 @@
-Tia Panchita|0|7000.00
-Tia Panchita|1|5000.00
-Tia Panchita|2|2500.00
-Tia Panchita|3|1000.00
-Expo Pintura|0|500.00
+Risas|0|5000.00
+Risas|1|2000.00
+Pintacaras|0|500.00
+Paco y Lola|0|1000.00
+Momonoke|0|7000.00
+Momonoke|1|5000.00

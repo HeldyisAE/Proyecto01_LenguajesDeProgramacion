@@ -2,6 +2,14 @@
 #include <string.h>
 #include "validacion.h"
 
+static void cifrarCesar(char *texto, int shift);
+
+static void cifrarCesar(char *texto, int shift) {
+    for (int i = 0; texto[i] != '\0'; i++) {
+        texto[i] = texto[i] + shift;
+    }
+}
+
 void leerCredenciales(char user[], char password[]) {
     FILE *file = fopen("datos/credenciales.json", "r");
 
@@ -35,8 +43,14 @@ int validate(char user[], char password[]) {
 
     leerCredenciales(userFile, passwordFile);
 
+    // Copia de la contraseña ingresada
+    char passwordCifrada[50];
+    strcpy(passwordCifrada, password);
+
+    cifrarCesar(passwordCifrada, 3);
+
     if (strcmp(userFile, user) == 0 &&
-        strcmp(passwordFile, password) == 0) {
+        strcmp(passwordFile, passwordCifrada) == 0) {
         return 1;
     } else {
         printf("access denegado, intente de nuevo\n");

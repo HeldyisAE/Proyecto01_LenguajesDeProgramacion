@@ -8,6 +8,7 @@ struct Sector {
     char codigoInicial;
     int capacidad;
     float precioBase;
+    char **asientos;
 };
 
 struct Evento {
@@ -29,5 +30,10 @@ void guardarEventos();
 void loadEvents();
 void loadSegments();
 void savePrices();
+void mostrarSitiosYSectores();
+void agregarSectorASitio();
+void resetearSectores();
+void generarAsientos(struct Sector *sec);
+void liberarAsientos(struct Sector *sec);
 
 #endif
