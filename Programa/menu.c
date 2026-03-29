@@ -30,7 +30,12 @@ int menuAdmin() {
     printf("0. Volver\n");
     printf("------------------------------\n");
     printf("> ");
-    scanf("%d", &option);
+
+    while (scanf("%d", &option) != 1) {
+        while (getchar() != '\n'); //Limpia el buffer si la entrada no es válida
+        printf("Opción no válida, intente de nuevo: ");
+    }
+    while (getchar() != '\n'); //Limpia el salto de línea restante
 
     return option;
 }
@@ -63,7 +68,12 @@ int menuGeneral() {
     printf("0. Salir\n");
     printf("------------------------------\n");
     printf("> ");
-    scanf("%d", &option);
+
+    while (scanf("%d", &option) != 1) {
+        while (getchar() != '\n'); //Limpia el buffer si la entrada no es válida
+        printf("Opción no válida, intente de nuevo: ");
+    }
+    while (getchar() != '\n'); //Limpia el salto de línea restante
 
     return option;
 }

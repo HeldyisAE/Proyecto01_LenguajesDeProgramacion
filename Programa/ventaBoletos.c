@@ -62,13 +62,13 @@ static int asientoYaVendido(char *nombreEvento, char *nombreSector, int asiento)
                 asientoFile == asiento) {
 
                 fclose(f);
-                return 1; 
+                return 1;
             }
         }
     }
 
     fclose(f);
-    return 0; 
+    return 0;
 }
 
 /*
@@ -96,9 +96,13 @@ void procesoCompra() {
         printf("%d. %s\n", i + 1, eventos[i].nombre);
     }
 
+    // Validación de selección de evento
     int selEv;
     printf("Seleccione un evento: ");
-    scanf("%d", &selEv);
+    while (scanf("%d", &selEv) != 1 || selEv < 1 || selEv > numEventos) {
+        while (getchar() != '\n'); //Limpia el buffer si la entrada no es válida
+        printf("Opción invalida, intente de nuevo: ");
+    }
     int evIndex = selEv - 1; //Resta 1 a la selección para obtener el indice real
     int sitIndex = eventos[evIndex].idSitio;
 
@@ -110,43 +114,62 @@ void procesoCompra() {
                eventos[evIndex].preciosSectores[j]);
     }
 
+    // Validación de selección de sector
     int selSec;
     printf("Seleccione sector: ");
-    scanf("%d", &selSec);
+    while (scanf("%d", &selSec) != 1 || selSec < 1 || selSec > sitios[sitIndex].numSectores) {
+        while (getchar() != '\n'); //Limpia el buffer si la entrada no es válida
+        printf("Opción invalida, intente de nuevo: ");
+    }
     int secIndex = selSec - 1;
 
+    // Validación de nombre del cliente
     char nombreC[MAX_NOMBRE_CLIENTE];
-    char cedula[MAX_CEDULA];
-    printf("\nNombre del cliente: ");
     getchar();
-    fgets(nombreC, 50, stdin);
-    nombreC[strcspn(nombreC, "\n")] = 0;
+    do {
+        printf("\nNombre del cliente: ");
+        fgets(nombreC, MAX_NOMBRE_CLIENTE, stdin);
+        nombreC[strcspn(nombreC, "\n")] = 0;
 
-    printf("Cedula: ");
-    scanf("%19s", cedula);
+        if (strlen(nombreC) == 0) {
+            printf("El nombre no puede estar vacío.\n");
+        }
+    } while (strlen(nombreC) == 0);
 
+    // Validación de cédula
+    char cedula[MAX_CEDULA];
+    do {
+        printf("Cedula: ");
+        if (scanf("%19s", cedula) != 1) {
+            while (getchar() != '\n'); //Limpia el buffer si la entrada no es válida
+            cedula[0] = '\0';
+            printf("Cedula invalida.\n");
+        }
+    } while (strlen(cedula) == 0);
+
+    // Validación de cantidad de boletos
     int cantidad;
     printf("\nCuantos boletos desea comprar?: ");
-    scanf("%d", &cantidad);
+    while (scanf("%d", &cantidad) != 1 || cantidad < 1 || cantidad > MAX_ASIENTOS) {
+        while (getchar() != '\n'); //Limpia el buffer si la entrada no es válida
+        printf("Cantidad invalida (1 a %d): ", MAX_ASIENTOS);
+    }
 
     int asientos[MAX_ASIENTOS];
     float precio = eventos[evIndex].preciosSectores[secIndex]; //Obtiene precio del arreglo preciosSectores
-
     float subtotal = 0;
 
     for (int i = 0; i < cantidad; i++) {
+        // Validación de número de asiento
         printf("Asiento #%d (1 a %d): ", i + 1, sitios[sitIndex].sectores[secIndex].capacidad);
-
-        scanf("%d", &asientos[i]);
-
-        if (asientos[i] < 1 ||
-            asientos[i] > sitios[sitIndex].sectores[secIndex].capacidad) {
-            printf("Asiento invalido.\n");
-            return;
+        while (scanf("%d", &asientos[i]) != 1 ||
+               asientos[i] < 1 ||
+               asientos[i] > sitios[sitIndex].sectores[secIndex].capacidad) {
+            while (getchar() != '\n'); //Limpia el buffer si la entrada no es válida
+            printf("Asiento invalido (1 a %d): ", sitios[sitIndex].sectores[secIndex].capacidad);
         }
 
         if (asientoYaVendido(eventos[evIndex].nombre, sitios[sitIndex].sectores[secIndex].nombre, asientos[i])) {
-
             printf("El asiento %d ya fue vendido.\n", asientos[i]);
             return;
         }

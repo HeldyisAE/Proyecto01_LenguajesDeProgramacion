@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <windows.h>
+#include <stdlib.h>
 #include <time.h>
 #include "menu.h"
 #include "validacion.h"
@@ -30,8 +30,6 @@
  * respectivo para cada menú. Otro valor no es válido
  */
 int main() {
-    SetConsoleOutputCP(CP_UTF8);
-    
     loadInitialSites();
     loadEvents();
     loadSegments();
@@ -91,7 +89,7 @@ int main() {
                         printf("Volviendo al menu principal...\n");
                         break;
                     default:
-                        printf("Opción invalida\n");
+                        printf("Opcion invalida\n");
                         break;
                     }
                     if (option2 == 0) break;
@@ -111,7 +109,7 @@ int main() {
             printf("--- HASTA LA PROXIMA ---\n");
             break;
         default:
-            printf("Opción invalida\n");
+            printf("Opcion invalida\n");
             break;
         }
         if (option1 == 0) break;

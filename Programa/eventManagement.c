@@ -91,19 +91,17 @@ void gestionarSectores() {
         printf("3. Resetear sectores de un sitio\n");
         printf("0. Volver\n");
         printf("> ");
-        scanf("%d", &opcion);
+
+        while (scanf("%d", &opcion) != 1) {
+            while (getchar() != '\n'); //Limpia el buffer si la entrada no es válida
+            printf("Opción no válida, intente de nuevo: ");
+        }
         limpiarBuffer();
 
         switch (opcion) {
-            case 1:
-                mostrarSitiosYSectores();
-                break;
-            case 2:
-                agregarSectorASitio();
-                break;
-            case 3:
-                resetearSectores();
-                break;
+            case 1: mostrarSitiosYSectores(); break;
+            case 2: agregarSectorASitio();    break;
+            case 3: resetearSectores();       break;
         }
 
     } while (opcion != 0);
@@ -171,39 +169,63 @@ void agregarSectorASitio() {
 
     int sel;
     printf("\nSeleccione el sitio: ");
-    scanf("%d", &sel);
+    while (scanf("%d", &sel) != 1 || sel < 1 || sel > numSitios) {
+        while (getchar() != '\n');
+        printf("Opción invalida, intente de nuevo: ");
+    }
     limpiarBuffer();
 
     int idx = sel - 1;
     struct Site *s = &sitios[idx];
 
-    struct Sector *temp = realloc(s->sectores, (s->numSectores + 1) * sizeof(struct Sector));
-
-    if (!temp) return; //Termina si el puntero está vacío
-    s->sectores = temp; //Intercambia valores
-
     int sectoresToAdd;
     printf("\nCuantos sectores desea agregar?: ");
-    scanf("%d", &sectoresToAdd);
+    while (scanf("%d", &sectoresToAdd) != 1 || sectoresToAdd < 1) {
+        while (getchar() != '\n');
+        printf("Cantidad invalida, intente de nuevo: ");
+    }
     limpiarBuffer();
 
     for (int i = 0; i < sectoresToAdd; i++) {
+
+        // Realloc dentro del loop para reservar espacio en cada iteración
+        struct Sector *temp = realloc(s->sectores, (s->numSectores + 1) * sizeof(struct Sector));
+        if (!temp) {
+            printf("Error de memoria.\n");
+            return;
+        }
+        s->sectores = temp;
+
         struct Sector *nuevo = &s->sectores[s->numSectores];
 
         printf("\n--- Sector %d ---\n", i + 1);
 
-        printf("\nNombre sector: ");
-        fgets(nuevo->nombre, MAX_NOMBRE_SECTOR, stdin);
-        nuevo->nombre[strcspn(nuevo->nombre, "\n")] = 0;
+        do {
+            printf("\nNombre sector: ");
+            fgets(nuevo->nombre, MAX_NOMBRE_SECTOR, stdin);
+            nuevo->nombre[strcspn(nuevo->nombre, "\n")] = 0;
+            if (strlen(nuevo->nombre) == 0) {
+                printf("El nombre no puede estar vacío.\n");
+            }
+        } while (strlen(nuevo->nombre) == 0);
 
         printf("\nInicial identificadora: ");
-        scanf(" %c", &nuevo->codigoInicial);
+        while (scanf(" %c", &nuevo->codigoInicial) != 1) {
+            while (getchar() != '\n');
+            printf("Entrada invalida, intente de nuevo: ");
+        }
 
         printf("\nCapacidad: ");
-        scanf("%d", &nuevo->capacidad);
+        while (scanf("%d", &nuevo->capacidad) != 1 || nuevo->capacidad < 1) {
+            while (getchar() != '\n');
+            printf("Capacidad invalida, intente de nuevo: ");
+        }
 
         printf("\nPrecio base: ");
-        scanf("%f", &nuevo->precioBase);
+        while (scanf("%f", &nuevo->precioBase) != 1 || nuevo->precioBase < 0) {
+            while (getchar() != '\n');
+            printf("Precio invalido, intente de nuevo: ");
+        }
         limpiarBuffer();
 
         generarAsientos(nuevo);
@@ -230,9 +252,13 @@ void resetearSectores() {
         printf("%d. %s\n", i + 1, sitios[i].nombre);
     }
 
+    // Validación de selección de sitio
     int sel;
     printf("Seleccione sitio: ");
-    scanf("%d", &sel);
+    while (scanf("%d", &sel) != 1 || sel < 1 || sel > numSitios) {
+        while (getchar() != '\n'); //Limpia el buffer si la entrada no es válida
+        printf("Opción invalida, intente de nuevo: ");
+    }
     limpiarBuffer();
 
     int idx = sel - 1;
@@ -282,19 +308,49 @@ void gestionarEventos() {
 
     limpiarBuffer();
 
-    printf("Nombre del Evento: ");
-    fgets(eventos[numEventos].nombre, MAX_NOMBRE_EVENTO, stdin);
-    eventos[numEventos].nombre[strcspn(eventos[numEventos].nombre, "\n")] = 0;
+    // Validación de nombre de evento no vacío
+    do {
+        printf("Nombre del Evento: ");
+        fgets(eventos[numEventos].nombre, MAX_NOMBRE_EVENTO, stdin);
+        eventos[numEventos].nombre[strcspn(eventos[numEventos].nombre, "\n")] = 0;
+        if (strlen(eventos[numEventos].nombre) == 0) {
+            printf("El nombre no puede estar vacío.\n");
+        }
+    } while (strlen(eventos[numEventos].nombre) == 0);
 
-    printf("Productora: ");
-    fgets(eventos[numEventos].productora, MAX_PRODUCTORA, stdin);
-    eventos[numEventos].productora[strcspn(eventos[numEventos].productora, "\n")] = 0;
+    // Validación de productora no vacía
+    do {
+        printf("Productora: ");
+        fgets(eventos[numEventos].productora, MAX_PRODUCTORA, stdin);
+        eventos[numEventos].productora[strcspn(eventos[numEventos].productora, "\n")] = 0;
+        if (strlen(eventos[numEventos].productora) == 0) {
+            printf("La productora no puede estar vacía.\n");
+        }
+    } while (strlen(eventos[numEventos].productora) == 0);
 
-    printf("Fecha (DD/MM/AAAA): ");
-    scanf("%14s", eventos[numEventos].fecha);
+    // Validación de fecha no vacía
+    do {
+        printf("Fecha (DD/MM/AAAA): ");
+        if (scanf("%14s", eventos[numEventos].fecha) != 1) {
+            while (getchar() != '\n'); //Limpia el buffer si la entrada no es válida
+            eventos[numEventos].fecha[0] = '\0';
+        }
+        if (strlen(eventos[numEventos].fecha) == 0) {
+            printf("La fecha no puede estar vacía.\n");
+        }
+    } while (strlen(eventos[numEventos].fecha) == 0);
 
-    printf("Hora (HH:MM): ");
-    scanf("%9s", eventos[numEventos].hora);
+    // Validación de hora no vacía
+    do {
+        printf("Hora (HH:MM): ");
+        if (scanf("%9s", eventos[numEventos].hora) != 1) {
+            while (getchar() != '\n'); //Limpia el buffer si la entrada no es válida
+            eventos[numEventos].hora[0] = '\0';
+        }
+        if (strlen(eventos[numEventos].hora) == 0) {
+            printf("La hora no puede estar vacía.\n");
+        }
+    } while (strlen(eventos[numEventos].hora) == 0);
     limpiarBuffer();
 
     printf("\nSeleccione el Lugar:\n");
@@ -302,16 +358,27 @@ void gestionarEventos() {
         printf("%d. %s\n", i + 1, sitios[i].nombre);
     }
 
+    // Validación de selección de sitio
     int sel;
-    if (scanf("%d", &sel) != 1 || sel < 1 || sel > numSitios) {
-        printf(" ! Seleccion invalida.\n");
-        limpiarBuffer();
-        return;
+    printf("Seleccione sitio: ");
+    while (scanf("%d", &sel) != 1 || sel < 1 || sel > numSitios) {
+        while (getchar() != '\n'); //Limpia el buffer si la entrada no es válida
+        printf(" ! Seleccion invalida, intente de nuevo: ");
     }
     limpiarBuffer();
 
     int sIdx = sel - 1;
     eventos[numEventos].idSitio = sIdx;
+
+    //Verifica que no exista otro evento en el mismo sitio y fecha
+    for (int i = 0; i < numEventos; i++) {
+        if (eventos[i].idSitio == sIdx &&
+            strcmp(eventos[i].fecha, eventos[numEventos].fecha) == 0) {
+            printf(" ! Ya existe un evento en ese sitio para la fecha %s.\n",
+                   eventos[numEventos].fecha);
+            return;
+        }
+    }
 
     int nSect = sitios[sIdx].numSectores;
 
@@ -332,7 +399,13 @@ void gestionarEventos() {
             printf("  Precio para %s (Base: %.2f): ",
                 sitios[sIdx].sectores[i].nombre,
                 sitios[sIdx].sectores[i].precioBase);
-            scanf("%f", &eventos[numEventos].preciosSectores[i]);
+
+            // Validación de precio mayor o igual a 0
+            while (scanf("%f", &eventos[numEventos].preciosSectores[i]) != 1 ||
+                   eventos[numEventos].preciosSectores[i] < 0) {
+                while (getchar() != '\n'); //Limpia el buffer si la entrada no es válida
+                printf("Precio invalido, intente de nuevo: ");
+            }
         }
         limpiarBuffer();
     }

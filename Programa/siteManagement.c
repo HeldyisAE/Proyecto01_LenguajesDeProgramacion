@@ -35,8 +35,12 @@ int menuSitesManagement() {
     printf("4. Mostrar sitios\n");
     printf("0. Volver\n");
     printf("> ");
-    scanf("%d", &option);    
-    limpiarBuffer();  // Limpia el salto de línea después de scanf
+
+    while (scanf("%d", &option) != 1) {
+        while (getchar() != '\n'); //Limpia el buffer si la entrada no es válida
+        printf("Opción no válida, intente de nuevo: ");
+    }
+    limpiarBuffer();
     return option;
 }
 
@@ -93,17 +97,17 @@ int findSiteIndexByName(const char *nombre) {
  */
 static void trimWhitespace(char *str) {
     int start = 0, end = strlen(str) - 1;
-    
+
     // Elimina espacios al inicio
     while (start <= end && (str[start] == ' ' || str[start] == '\t')) {
         start++;
     }
-    
+
     // Elimina espacios al final
     while (end >= start && (str[end] == ' ' || str[end] == '\t')) {
         end--;
     }
-    
+
     // Copia cadena limpia
     int j = 0;
     for (int i = start; i <= end; i++) {
@@ -131,16 +135,16 @@ static void limpiarBuffer() {
 /*
  * cargarSitiosDesdeArchivo
  *
- * Objetivo: Entrar al archivo de sitios en modo lectura y cargarlos al arreglo 
+ * Objetivo: Entrar al archivo de sitios en modo lectura y cargarlos al arreglo
  *
- * Entradas: const char *rutaArchivo - Representa la ruta del archivo para lectura 
+ * Entradas: const char *rutaArchivo - Representa la ruta del archivo para lectura
  *           int esInicial - Corresponde a un int booleano (0, 1) para describir el estado
  * de ejecución actual, diferencia si se está cargando un nuevo archivo o si se está iniciando
  * el sistema
  *
  * Salidas: void
  *
- * Restricciones: Se espera que la ruta de archivo sea válida, 
+ * Restricciones: Se espera que la ruta de archivo sea válida
  */
 static void cargarSitiosDesdeArchivo(const char *rutaArchivo, int esInicial) {
     FILE *archivo;
@@ -149,7 +153,7 @@ static void cargarSitiosDesdeArchivo(const char *rutaArchivo, int esInicial) {
     int resultado; //Linea parseada
     int sitiosAgregados = 0;
     int sitiosDuplicados = 0;
-    
+
     archivo = fopen(rutaArchivo, "r");
     if (archivo == NULL) {
         if (esInicial) {
@@ -159,20 +163,20 @@ static void cargarSitiosDesdeArchivo(const char *rutaArchivo, int esInicial) {
         }
         return;
     }
-    
+
     while (fgets(linea, sizeof(linea), archivo) != NULL) {
 
         //Limpia saltos de linea
         if (linea[strlen(linea) - 1] == '\n') {
             linea[strlen(linea) - 1] = '\0';
         }
-        
+
         //Lineas en blanco
         if (strlen(linea) == 0) continue;
-        
+
         // Parsear la línea
         resultado = sscanf(linea, "%49[^,], %49[^,], %49[^\n]", nombre, ubicacion, web);
-        
+
         // Si no hay web sscanf retorna 2
         if (resultado < 2) {
             if (!esInicial) {
@@ -180,7 +184,7 @@ static void cargarSitiosDesdeArchivo(const char *rutaArchivo, int esInicial) {
             }
             continue;
         }
-        
+
         //Limpia espacios en blanco en los valores
         trimWhitespace(nombre);
         trimWhitespace(ubicacion);
@@ -189,7 +193,7 @@ static void cargarSitiosDesdeArchivo(const char *rutaArchivo, int esInicial) {
         } else {
             web[0] = '\0';
         }
-        
+
         // Verifica unicidad
         if (siteExists(nombre)) {
             if (!esInicial) {
@@ -198,7 +202,7 @@ static void cargarSitiosDesdeArchivo(const char *rutaArchivo, int esInicial) {
             sitiosDuplicados++;
             continue;
         }
-        
+
         // Expande memoria si es necesario
         if (numSitios >= capacidad) {
             capacidad += INCREMENTO_MEMORIA;
@@ -210,7 +214,7 @@ static void cargarSitiosDesdeArchivo(const char *rutaArchivo, int esInicial) {
             }
             sitios = temp;
         }
-        
+
         // Agrega sitio al arreglo
         strcpy(sitios[numSitios].nombre, nombre);
         strcpy(sitios[numSitios].ubicacion, ubicacion);
@@ -220,9 +224,9 @@ static void cargarSitiosDesdeArchivo(const char *rutaArchivo, int esInicial) {
         numSitios++;
         sitiosAgregados++;
     }
-    
+
     fclose(archivo);
-    
+
     //Reporte de resultados
     if (!esInicial) {
         printf("\n--- Resumen de carga ---\n");
@@ -245,18 +249,18 @@ static void cargarSitiosDesdeArchivo(const char *rutaArchivo, int esInicial) {
  */
 void saveFile() {
     FILE *archivo;
-    
-    archivo = fopen("datos/sitios.txt", "w");
+
+    archivo = fopen(RUTA_SITIOS, "w");
     if (archivo == NULL) {
         printf("Error: No se pudo guardar el archivo de sitios\n");
         return;
     }
-    
+
     // Escribe cada sitio en formato: nombre,ubicacion,web
     for (int i = 0; i < numSitios; i++) {
         fprintf(archivo, "%s,%s,%s\n", sitios[i].nombre, sitios[i].ubicacion, sitios[i].web);
     }
-    
+
     fclose(archivo);
 }
 
@@ -289,17 +293,21 @@ void loadInitialSites() {
  */
 void loadFile() {
     char rutaArchivo[MAX_RUTA];
-    
-    printf("Ingrese la dirección del archivo que desea cargar: ");
-    fgets(rutaArchivo, sizeof(rutaArchivo), stdin);
-    
-    // Elimina salto de línea si existe
-    if (rutaArchivo[strlen(rutaArchivo) - 1] == '\n') {
-        rutaArchivo[strlen(rutaArchivo) - 1] = '\0';
-    }
-    
+
+    // Validación de ruta no vacía
+    do {
+        printf("Ingrese la dirección del archivo que desea cargar: ");
+        fgets(rutaArchivo, sizeof(rutaArchivo), stdin);
+        if (rutaArchivo[strlen(rutaArchivo) - 1] == '\n') {
+            rutaArchivo[strlen(rutaArchivo) - 1] = '\0';
+        }
+        if (strlen(rutaArchivo) == 0) {
+            printf("La ruta no puede estar vacía.\n");
+        }
+    } while (strlen(rutaArchivo) == 0);
+
     cargarSitiosDesdeArchivo(rutaArchivo, 0);
-    
+
     saveFile();
 }
 
@@ -320,20 +328,27 @@ void editSite() {
         printf("\nNo hay sitios disponibles para editar.\n");
         return;
     }
-    
-    char siteName[50];
+
+    char siteName[MAX_NOMBRE];
     int siteIndex;
     int optEdit;
-    char newValue[50];
-    
-    printf("\nIngrese el nombre del sitio a modificar: ");
-    fgets(siteName, sizeof(siteName), stdin);
-    if (siteName[strlen(siteName) - 1] == '\n') {
-        siteName[strlen(siteName) - 1] = '\0';
-    }
-    trimWhitespace(siteName);
+    char newValue[MAX_NOMBRE];
+
+    // Validación de nombre no vacío
+    do {
+        printf("\nIngrese el nombre del sitio a modificar: ");
+        fgets(siteName, sizeof(siteName), stdin);
+        if (siteName[strlen(siteName) - 1] == '\n') {
+            siteName[strlen(siteName) - 1] = '\0';
+        }
+        trimWhitespace(siteName);
+        if (strlen(siteName) == 0) {
+            printf("El nombre no puede estar vacío.\n");
+        }
+    } while (strlen(siteName) == 0);
+
     siteIndex = findSiteIndexByName(siteName); //Busca el índice del sitio
-    
+
     if (siteIndex == -1) {
         printf("\nError: No se encontró el sitio '%s'.\n", siteName);
         return;
@@ -344,49 +359,55 @@ void editSite() {
     printf("Nombre: %s\n", sitios[siteIndex].nombre);
     printf("Ubicación: %s\n", sitios[siteIndex].ubicacion);
     printf("Sitio web: %s\n", sitios[siteIndex].web);
-    
+
     printf("\n--- Seleccione qué desea editar ---\n");
     printf("1. Editar nombre\n");
     printf("2. Editar ubicación\n");
     printf("3. Editar sitio web\n");
     printf("4. Volver\n");
     printf("> ");
-    scanf("%d", &optEdit);
+
+    while (scanf("%d", &optEdit) != 1) {
+        while (getchar() != '\n'); //Limpia el buffer si la entrada no es válida
+        printf("Opción no válida, intente de nuevo: ");
+    }
     limpiarBuffer();
-    
+
     switch (optEdit) {
         case 1:
-            printf("Ingrese el nuevo nombre: ");
-            fgets(newValue, sizeof(newValue), stdin);
-            if (newValue[strlen(newValue) - 1] == '\n') {
-                newValue[strlen(newValue) - 1] = '\0';
-            }
-            trimWhitespace(newValue); //Elimina espacios blancos en el nuevo valor
-            
-            if (strlen(newValue) == 0) {
-                printf("Error: El nombre no puede estar vacío.\n");
-            } else {
-                strcpy(sitios[siteIndex].nombre, newValue); //Copia el nuevo valor en el lugar correspondiente
-                printf("Nombre actualizado correctamente.\n");
-            }
+            do {
+                printf("Ingrese el nuevo nombre: ");
+                fgets(newValue, sizeof(newValue), stdin);
+                if (newValue[strlen(newValue) - 1] == '\n') {
+                    newValue[strlen(newValue) - 1] = '\0';
+                }
+                trimWhitespace(newValue); //Elimina espacios blancos en el nuevo valor
+                if (strlen(newValue) == 0) {
+                    printf("Error: El nombre no puede estar vacío.\n");
+                }
+            } while (strlen(newValue) == 0);
+
+            strcpy(sitios[siteIndex].nombre, newValue); //Copia el nuevo valor en el lugar correspondiente
+            printf("Nombre actualizado correctamente.\n");
             break;
-            
+
         case 2:
-            printf("Ingrese la nueva ubicación: ");
-            fgets(newValue, sizeof(newValue), stdin);
-            if (newValue[strlen(newValue) - 1] == '\n') {
-                newValue[strlen(newValue) - 1] = '\0';
-            }
-            trimWhitespace(newValue);
-            
-            if (strlen(newValue) == 0) {
-                printf("Error: La ubicación no puede estar vacía.\n");
-            } else {
-                strcpy(sitios[siteIndex].ubicacion, newValue);
-                printf("Ubicación actualizada correctamente.\n");
-            }
+            do {
+                printf("Ingrese la nueva ubicación: ");
+                fgets(newValue, sizeof(newValue), stdin);
+                if (newValue[strlen(newValue) - 1] == '\n') {
+                    newValue[strlen(newValue) - 1] = '\0';
+                }
+                trimWhitespace(newValue);
+                if (strlen(newValue) == 0) {
+                    printf("Error: La ubicación no puede estar vacía.\n");
+                }
+            } while (strlen(newValue) == 0);
+
+            strcpy(sitios[siteIndex].ubicacion, newValue);
+            printf("Ubicación actualizada correctamente.\n");
             break;
-            
+
         case 3:
             printf("Ingrese el nuevo sitio web: ");
             fgets(newValue, sizeof(newValue), stdin);
@@ -394,19 +415,19 @@ void editSite() {
                 newValue[strlen(newValue) - 1] = '\0';
             }
             trimWhitespace(newValue);
-            strcpy(sitios[siteIndex].web, newValue);
+            strcpy(sitios[siteIndex].web, newValue); //El sitio web sí puede quedar vacío
             printf("Sitio web actualizado correctamente.\n");
             break;
-            
+
         case 4:
             printf("Operación cancelada.\n");
             return;
-            
+
         default:
             printf("Opción no válida.\n");
             return;
     }
-    
+
     saveFile(); //Guarda los nuevos datos
 }
 
@@ -426,19 +447,26 @@ void deleteSite() {
         printf("\nNo hay sitios disponibles para eliminar.\n");
         return;
     }
-    
+
     char siteName[MAX_NOMBRE];
     int siteIndex;
     int confirm;
-    
-    printf("\nIngrese el nombre del sitio a eliminar: ");
-    fgets(siteName, sizeof(siteName), stdin);
-    if (siteName[strlen(siteName) - 1] == '\n') {
-        siteName[strlen(siteName) - 1] = '\0';
-    }
-    trimWhitespace(siteName);
+
+    // Validación de nombre no vacío
+    do {
+        printf("\nIngrese el nombre del sitio a eliminar: ");
+        fgets(siteName, sizeof(siteName), stdin);
+        if (siteName[strlen(siteName) - 1] == '\n') {
+            siteName[strlen(siteName) - 1] = '\0';
+        }
+        trimWhitespace(siteName);
+        if (strlen(siteName) == 0) {
+            printf("El nombre no puede estar vacío.\n");
+        }
+    } while (strlen(siteName) == 0);
+
     siteIndex = findSiteIndexByName(siteName);
-    
+
     if (siteIndex == -1) {
         printf("\nError: No se encontró el sitio '%s'.\n", siteName);
         return;
@@ -448,22 +476,26 @@ void deleteSite() {
     printf("Nombre: %s\n", sitios[siteIndex].nombre);
     printf("Ubicación: %s\n", sitios[siteIndex].ubicacion);
     printf("Sitio web: %s\n", sitios[siteIndex].web);
-    
+
     printf("\n--- Confirmar eliminación ---\n");
     printf("Desea eliminar este sitio?\n");
     printf("1. Confirmar eliminación\n");
     printf("2. Cancelar\n");
     printf("> ");
-    scanf("%d", &confirm);
+
+    while (scanf("%d", &confirm) != 1) {
+        while (getchar() != '\n'); //Limpia el buffer si la entrada no es válida
+        printf("Opción no válida, intente de nuevo: ");
+    }
     limpiarBuffer();
-    
+
     if (confirm == 1) {
         // Desplaza los elementos posteriores una posición hacia atrás
         for (int i = siteIndex; i < numSitios - 1; i++) {
             sitios[i] = sitios[i + 1];
         }
         numSitios--;
-        
+
         printf("\nSitio eliminado correctamente.\n");
 
         saveFile();
@@ -526,10 +558,10 @@ void showSites() {
  */
 void manageSitesMenu() {
     int option;
-    
+
     for (;;) {
         option = menuSitesManagement();
-        
+
         switch (option) {
             case 1:
                 printf("\n--- Cargando archivo de sitios ---\n");
@@ -549,13 +581,13 @@ void manageSitesMenu() {
                 break;
             case 0:
                 printf("Volviendo al menú anterior...\n");
-                return; 
+                return;
             default:
                 printf("Opción no válida. Intente de nuevo.\n");
                 break;
         }
-        
+
         printf("\nPresione Enter para continuar...");
-        getchar();  // Espera a que el usuario presione Enter
+        getchar(); // Espera a que el usuario presione Enter
     }
 }
