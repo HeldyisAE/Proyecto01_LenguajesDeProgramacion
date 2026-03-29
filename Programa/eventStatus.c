@@ -45,7 +45,7 @@ void sectorInfo(int index) {
     int sitioIndice = eventos[index].idSitio;
     int numSect = sitios[sitioIndice].numSectores;
 
-    printf("\n--- INFORMACIÓN DE LOS SECTORES ---\n");
+    printf("\n--- INFORMACION DE LOS SECTORES ---\n");
 
     for (int i = 0; i < numSect; i++) {
         struct Sector s = sitios[sitioIndice].sectores[i];

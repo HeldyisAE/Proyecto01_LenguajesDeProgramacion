@@ -183,7 +183,7 @@ void agregarSectorASitio() {
     s->sectores = temp; //Intercambia valores
 
     int sectoresToAdd;
-    printf("\n¿Cuántos sectores desea agregar?: ");
+    printf("\nCuantos sectores desea agregar?: ");
     scanf("%d", &sectoresToAdd);
     limpiarBuffer();
 
@@ -377,7 +377,7 @@ static void cargarEventosDesdeArchivo(const char *rutaArchivo) {
                        nombre, productora, fecha, hora, &idSitio);
 
         if (r != 5) {
-            printf("Linea inválida (evento): %s\n", linea);
+            printf("Linea invalida (evento): %s\n", linea);
             continue;
         }
 
@@ -527,7 +527,7 @@ static void cargarSectoresDesdeArchivo(const char *rutaArchivo) {
                        nombreSitio, nombreSector, &codigo, &capacidad, &precio);
 
         if (r != 5) {
-            printf("Linea inválida (sector): %s\n", linea);
+            printf("Linea invalida (sector): %s\n", linea);
             continue;
         }
 

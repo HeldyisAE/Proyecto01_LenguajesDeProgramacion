@@ -117,7 +117,6 @@ void procesoCompra() {
 
     char nombreC[MAX_NOMBRE_CLIENTE];
     char cedula[MAX_CEDULA];
-
     printf("\nNombre del cliente: ");
     getchar();
     fgets(nombreC, 50, stdin);
@@ -127,7 +126,7 @@ void procesoCompra() {
     scanf("%19s", cedula);
 
     int cantidad;
-    printf("\n¿Cuantos boletos desea comprar?: ");
+    printf("\nCuantos boletos desea comprar?: ");
     scanf("%d", &cantidad);
 
     int asientos[MAX_ASIENTOS];

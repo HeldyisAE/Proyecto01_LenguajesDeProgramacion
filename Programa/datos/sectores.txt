@@ -1,6 +1,0 @@
-Casa de la Cultura|VIP|V|10|1000.00
-Casa de la Cultura|Palco|P|50|500.00
-Anfiteatro|Graderia|G|50|2000.00
-Galería Siquirres|publico|P|15|500.00
-Teatro Brown|VIP|V|10|5000.00
-Teatro Brown|Palco|P|20|3000.00

@@ -296,7 +296,7 @@ void mostrarEstadisticas() {
 
     printf("==========================================\n");
 
-    printf("\n===== DETALLE ESTADÍSTICO =====\n");
+    printf("\n===== DETALLE ESTADISTICO =====\n");
     topMeses();
     topProductoras();
     estadisticasSitios();

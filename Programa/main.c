@@ -88,10 +88,10 @@ int main() {
                         mostrarEstadisticas();//Consulta de estadísticas
                         break;
                     case 0:
-                        printf("Volviendo al menú principal...\n");
+                        printf("Volviendo al menu principal...\n");
                         break;
                     default:
-                        printf("Opción inválida\n");
+                        printf("Opción invalida\n");
                         break;
                     }
                     if (option2 == 0) break;
@@ -108,10 +108,10 @@ int main() {
             procesoCompra(); //Gestion de compra de boletos
             break;
         case 0:
-            printf("--- HASTA LA PRÓXIMA ---\n");
+            printf("--- HASTA LA PROXIMA ---\n");
             break;
         default:
-            printf("Opción inválida\n");
+            printf("Opción invalida\n");
             break;
         }
         if (option1 == 0) break;

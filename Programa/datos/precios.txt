@@ -1,6 +1,0 @@
-Risas|0|5000.00
-Risas|1|2000.00
-Pintacaras|0|500.00
-Paco y Lola|0|1000.00
-Momonoke|0|7000.00
-Momonoke|1|5000.00

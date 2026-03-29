@@ -328,14 +328,10 @@ void editSite() {
     
     printf("\nIngrese el nombre del sitio a modificar: ");
     fgets(siteName, sizeof(siteName), stdin);
-
-    //Elimina saltos de linea
     if (siteName[strlen(siteName) - 1] == '\n') {
         siteName[strlen(siteName) - 1] = '\0';
     }
-    
     trimWhitespace(siteName);
-    
     siteIndex = findSiteIndexByName(siteName); //Busca el índice del sitio
     
     if (siteIndex == -1) {
@@ -437,13 +433,10 @@ void deleteSite() {
     
     printf("\nIngrese el nombre del sitio a eliminar: ");
     fgets(siteName, sizeof(siteName), stdin);
-
     if (siteName[strlen(siteName) - 1] == '\n') {
         siteName[strlen(siteName) - 1] = '\0';
     }
-    
     trimWhitespace(siteName);
-    
     siteIndex = findSiteIndexByName(siteName);
     
     if (siteIndex == -1) {
@@ -457,7 +450,7 @@ void deleteSite() {
     printf("Sitio web: %s\n", sitios[siteIndex].web);
     
     printf("\n--- Confirmar eliminación ---\n");
-    printf("¿Desea eliminar este sitio?\n");
+    printf("Desea eliminar este sitio?\n");
     printf("1. Confirmar eliminación\n");
     printf("2. Cancelar\n");
     printf("> ");
